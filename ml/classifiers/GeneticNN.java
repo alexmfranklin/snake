@@ -1,6 +1,5 @@
 package ml.classifiers;
 
-import ml.data.CrossValidationSet;
 import ml.data.DataSet;
 import ml.data.DataSetSplit;
 import ml.data.Example;

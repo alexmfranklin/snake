@@ -1,4 +1,9 @@
-package snake;
+import java.awt.Canvas;
+import java.awt.Graphics2D;
+import javax.swing.JFrame;
 
-import snake.board;
-import snake.Snake;
+
+public class Game {
+    private Board board;
+
+}
