@@ -217,9 +217,6 @@ public class DataSet {
 	 * @param num
 	 * @return
 	 */
-	public CrossValidationSet getCrossValidationSet(int num){
-		return new CrossValidationSet(this, num);
-	}
 	
 	/**
 	 * Get a cross-validation of this data set with num splits.  The
@@ -229,10 +226,6 @@ public class DataSet {
 	 * @param num
 	 * @return
 	 */
-	public CrossValidationSet getRandomCrossValidationSet(int num){
-		return new CrossValidationSet(this, num, true);
-	}
-	
 	/**
 	 * Create a complete copy of this dataset with a bias added
 	 * to the dataset, including all of the examples in the dataset. "this" DataSet
