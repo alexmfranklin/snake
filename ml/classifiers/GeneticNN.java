@@ -21,6 +21,8 @@ public class GeneticNN implements Classifier {
     private double theOutput = 0;
     private int numFeatures;
     private DataSet test;
+    public static int LEFT = 0;
+    public static int RIGHT = 1;
 
     /**
      * @param numHidden
@@ -137,6 +139,36 @@ public class GeneticNN implements Classifier {
             output += outputTable[i] * hiddenNodes[numLayers-1][i];
         }
         theOutput = Math.tanh(output);
+    }
+
+    public double[][] getInputTable(){
+        return inputTable;
+    }
+    public double[] getOutputTable(){
+        return outputTable;
+    }
+    public double[][][] getLayerTable(int cross_point, int direction ){
+        if(direction == LEFT){
+            double[][][] geneTable = new double[cross_point][numHidden+1][numHidden+1];
+
+            for(int i = 0; i <cross_point; i++) {
+
+                geneTable[i] = layerTable[i];
+            }
+            return geneTable;
+
+        }
+
+        else if(direction == RIGHT){
+            double[][][] geneTable = new double[numLayers-cross_point][numHidden+1][numHidden+1];
+            for(int i = cross_point; i < numLayers; i++){
+
+                geneTable[i-cross_point] = layerTable[i];
+
+            }
+            return geneTable;
+        }
+        throw new IllegalArgumentException("Please use GeneticNN.LEFT or GeneticNN.RIGHT");
     }
 
     /**
