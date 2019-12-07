@@ -184,6 +184,10 @@ public class TwoLayerNN implements Classifier {
         return Math.abs(theOutput);
     }
 
+    public static void main(String[] args) {
+
+    }
+
 
 
 }

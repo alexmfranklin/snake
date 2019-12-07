@@ -337,6 +337,32 @@ public class Board extends JPanel implements ActionListener {
 
     }
 
+    public void pressKey(int key) {
+        if ((key == KeyEvent.VK_LEFT ) && (!rightDirection)) {
+            leftDirection = true;
+            upDirection = false;
+            downDirection = false;
+        }
+
+        if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
+            rightDirection = true;
+            upDirection = false;
+            downDirection = false;
+        }
+
+        if ((key == KeyEvent.VK_UP) && (!downDirection)) {
+            upDirection = true;
+            rightDirection = false;
+            leftDirection = false;
+        }
+
+        if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
+            downDirection = true;
+            rightDirection = false;
+            leftDirection = false;
+        }
+    }
+
     private class TAdapter extends KeyAdapter {
 
         @Override
@@ -381,44 +407,32 @@ public class Board extends JPanel implements ActionListener {
 
         if( move < -1/3){
             if(this.isLeftDirection()){
-                r.keyPress(KeyEvent.VK_DOWN);
-                r.keyRelease(KeyEvent.VK_DOWN);
+                this.pressKey(KeyEvent.VK_DOWN);
             }
             else if(this.isRightDirection()){
-                r.keyPress(KeyEvent.VK_UP);
-                r.keyRelease(KeyEvent.VK_UP);
+                this.pressKey(KeyEvent.VK_UP);
             }
             else if(this.isUpDirection()){
-                r.keyPress(KeyEvent.VK_LEFT);
-                r.keyRelease(KeyEvent.VK_LEFT);
+                this.pressKey(KeyEvent.VK_LEFT);
             }
             else{
-                r.keyPress(KeyEvent.VK_RIGHT);
-                r.keyRelease(KeyEvent.VK_RIGHT);
-
-
+                this.pressKey(KeyEvent.VK_RIGHT);
             }
 
         }
 
         else if(move < 1/3){
             if(this.isLeftDirection()){
-                r.keyPress(KeyEvent.VK_UP);
-                r.keyRelease(KeyEvent.VK_UP);
+                this.pressKey(KeyEvent.VK_UP);
             }
             else if(this.isRightDirection()){
-                r.keyPress(KeyEvent.VK_DOWN);
-                r.keyRelease(KeyEvent.VK_DOWN);
+                this.pressKey(KeyEvent.VK_DOWN);
             }
             else if(this.isUpDirection()){
-                r.keyPress(KeyEvent.VK_RIGHT);
-                r.keyRelease(KeyEvent.VK_RIGHT);
+                this.pressKey(KeyEvent.VK_RIGHT);
             }
             else{
-                r.keyPress(KeyEvent.VK_LEFT);
-                r.keyRelease(KeyEvent.VK_LEFT);
-
-
+                this.pressKey(KeyEvent.VK_LEFT);
             }
         }
     }
