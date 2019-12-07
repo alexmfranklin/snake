@@ -1,10 +1,6 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
+import ml.classifiers.GeneticNN;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -44,13 +40,18 @@ public class Board extends JPanel implements ActionListener {
     private boolean upDirection = false;
     private boolean downDirection = false;
     private boolean inGame = true;
-
+    private boolean newTurn = true;
     private Timer timer;
     private Image ball;
     private Image apple;
     private Image head;
 
-    public Board() {
+    private GeneticNN network;
+    private int numFeatures;
+    int[] features;
+    Robot r = new Robot();
+
+    public Board() throws AWTException {
 
         initBoard();
     }
@@ -102,8 +103,12 @@ public class Board extends JPanel implements ActionListener {
 
         timer = new Timer(DELAY, this);
         timer.start();
+
     }
 
+    public void setNetwork(GeneticNN theNetwork){
+        network = theNetwork;
+    }
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -164,7 +169,9 @@ public class Board extends JPanel implements ActionListener {
             locateApple();
         }
     }
-
+    public boolean isGameOver(){
+        return !inGame;
+    }
     private void move() {
 
         for (int z = dots; z > 0; z--) {
@@ -248,6 +255,21 @@ public class Board extends JPanel implements ActionListener {
         return y[0]/10+1 < gridAppleY;
     }
 
+
+
+
+    public boolean isLeftDirection() {
+        return leftDirection;
+    }
+
+    public boolean isRightDirection() {
+        return rightDirection;
+    }
+
+    public boolean isUpDirection() {
+        return upDirection;
+    }
+
     private void checkCollision() {
 
         for (int z = dots; z > 0; z--) {
@@ -293,19 +315,26 @@ public class Board extends JPanel implements ActionListener {
         gridAppleY = ry+1;
         grid[rx+1][ry+1] = FOOD;
     }
-
+    public boolean hasMoved(){
+        return newTurn;
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         if (inGame) {
 
             checkApple();
             checkCollision();
+
             if(inGame) {
+                determineMove();
                 move();
+
             }
         }
 
         repaint();
+
+
     }
 
     private class TAdapter extends KeyAdapter {
@@ -315,7 +344,7 @@ public class Board extends JPanel implements ActionListener {
 
             int key = e.getKeyCode();
 
-            if ((key == KeyEvent.VK_LEFT) && (!rightDirection)) {
+            if ((key == KeyEvent.VK_LEFT ) && (!rightDirection)) {
                 leftDirection = true;
                 upDirection = false;
                 downDirection = false;
@@ -340,4 +369,70 @@ public class Board extends JPanel implements ActionListener {
             }
         }
     }
+    public void setNumFeatures(int i) {
+        numFeatures = i;
+    }
+    public void determineMove(){
+
+        features = new int[numFeatures];
+
+        setExample(features);
+        double move = network.classify(features);
+
+        if( move < -1/3){
+            if(this.isLeftDirection()){
+                r.keyPress(KeyEvent.VK_DOWN);
+                r.keyRelease(KeyEvent.VK_DOWN);
+            }
+            else if(this.isRightDirection()){
+                r.keyPress(KeyEvent.VK_UP);
+                r.keyRelease(KeyEvent.VK_UP);
+            }
+            else if(this.isUpDirection()){
+                r.keyPress(KeyEvent.VK_LEFT);
+                r.keyRelease(KeyEvent.VK_LEFT);
+            }
+            else{
+                r.keyPress(KeyEvent.VK_RIGHT);
+                r.keyRelease(KeyEvent.VK_RIGHT);
+
+
+            }
+
+        }
+
+        else if(move < 1/3){
+            if(this.isLeftDirection()){
+                r.keyPress(KeyEvent.VK_UP);
+                r.keyRelease(KeyEvent.VK_UP);
+            }
+            else if(this.isRightDirection()){
+                r.keyPress(KeyEvent.VK_DOWN);
+                r.keyRelease(KeyEvent.VK_DOWN);
+            }
+            else if(this.isUpDirection()){
+                r.keyPress(KeyEvent.VK_RIGHT);
+                r.keyRelease(KeyEvent.VK_RIGHT);
+            }
+            else{
+                r.keyPress(KeyEvent.VK_LEFT);
+                r.keyRelease(KeyEvent.VK_LEFT);
+
+
+            }
+        }
+    }
+    private void setExample(int[] features){
+        features[0] = ((this.getFront() == SNAKE) ? 1 : 0);
+        features[1] = ((this.getLeft() == SNAKE) ? 1 : 0);
+        features[2] = ((this.getRight() == SNAKE) ? 1 : 0);
+        features[3] = ((this.getFront() == WALL) ? 1 : 0);
+        features[4] = ((this.getLeft() == WALL) ? 1 : 0);
+        features[5] = ((this.getRight() == WALL) ? 1 : 0);
+        features[6] = ((this.appleUp()) ? 1 : 0);
+        features[7] = ((this.appleDown()) ? 1 : 0);
+        features[8] = ((this.appleLeft()) ? 1 : 0);
+        features[9] = ((this.appleRight()) ? 1 : 0);
+    }
+
 }

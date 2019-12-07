@@ -2,22 +2,27 @@ import ml.classifiers.GeneticNN;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class Game {
+    private static int numFeatures = 10;
 
     public Game() {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws AWTException {
         Snake snake = new Snake();
-        GeneticNN network = new GeneticNN(4, 3);
-
+        Board board  = snake.getBoard();
+        board.setNumFeatures(numFeatures);
+        GeneticNN network = new GeneticNN(8, 6);
+        network.train(numFeatures);
+        board.setNetwork(network);
         EventQueue.invokeLater(() -> {
             JFrame ex = snake;
-            System.out.println(snake.appleLeft());
             ex.setVisible(true);
+
+
         });
     }
-
 }

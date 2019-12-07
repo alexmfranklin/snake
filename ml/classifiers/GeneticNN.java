@@ -48,14 +48,14 @@ public class GeneticNN {
     /**
      * Train this classifier based on the data set
      *
-     * @param ex
+     * @param size
      */
-    public void train(int[] ex) {
+    public void train(int size) {
         // init random
         Random random = new Random();
 
         // get the number of possible features
-        numFeatures = ex.length;
+        numFeatures = size;
 
         // initialize and fill input table which stores the weights between the input features and hidden weights
         inputTable = new double[numFeatures][numHidden + 1];
@@ -178,8 +178,7 @@ public class GeneticNN {
     public double classify(int[] example) {
         updateHidden(example);
         updateOutput();
-        if (theOutput >= 0) return 1.0;
-        else return -1;
+        return theOutput;
     }
 
 //    @Override
