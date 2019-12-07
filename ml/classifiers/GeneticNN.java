@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-public class GeneticNN implements Classifier {
+public class GeneticNN {
     private double eta = .1;
     private int iterations = 200;
     private int numHidden;
@@ -48,15 +48,14 @@ public class GeneticNN implements Classifier {
     /**
      * Train this classifier based on the data set
      *
-     * @param data
+     * @param ex
      */
-    @Override
-    public void train(DataSet data) {
+    public void train(int[] ex) {
         // init random
         Random random = new Random();
 
         // get the number of possible features
-        numFeatures = data.getAllFeatureIndices().size();
+        numFeatures = ex.length;
 
         // initialize and fill input table which stores the weights between the input features and hidden weights
         inputTable = new double[numFeatures][numHidden + 1];
@@ -107,12 +106,12 @@ public class GeneticNN implements Classifier {
      *
      * @param el example passed in from the data set
      */
-    private void updateHidden(Example el) {
+    private void updateHidden(int[] el) {
         for (int l = 0; l < numLayers; l++) {
             for (int i = 0; i < numHidden; i++) {
                 if( l == 0) {
                     for (int j = 0; j < numFeatures; j++) {
-                        hiddenNodes[l][i] += inputTable[j][i] * el.getFeature(j);
+                        hiddenNodes[l][i] += inputTable[j][i] * el[j];
                     }
                     hiddenNodes[l][i] = Math.tanh(hiddenNodes[l][i]);
                 }
@@ -176,38 +175,17 @@ public class GeneticNN implements Classifier {
      * @param example
      * @return the class label predicted by the classifier for this example
      */
-    @Override
-    public double classify(Example example) {
+    public double classify(int[] example) {
         updateHidden(example);
         updateOutput();
         if (theOutput >= 0) return 1.0;
         else return -1;
     }
 
-    @Override
-    public double confidence(Example example) {
-        updateHidden(example);
-        updateOutput();
-        return Math.abs(theOutput);
-    }
-
-    public static void main(String args[]) {
-        DataSet data = new DataSet("data/titanic-train.csv", DataSet.CSVFILE);
-        data = data.getCopyWithBias();
-        GeneticNN classifier = new GeneticNN(3,4);
-        DataSetSplit splits = data.split(.9);
-
-        classifier.train(splits.getTrain());
-        double correct = 0, total = 0;
-        for(Example ex : splits.getTest().getData()) {
-            double prediction = classifier.classify(ex);
-            if(prediction == ex.getLabel()) {
-                correct ++;
-            }
-            total ++;
-        }
-        System.out.println(correct/total);
-
-        }
-
+//    @Override
+//    public double confidence(Example example) {
+//        updateHidden(example);
+//        updateOutput();
+//        return Math.abs(theOutput);
+//    }
 }

@@ -22,12 +22,22 @@ public class Board extends JPanel implements ActionListener {
     private final int RAND_POS = 29;
     private final int DELAY = 140;
 
+    private static final int EMPTY = 0;
+    private static final int SNAKE = 1;
+    private static final int FOOD = 2;
+    private static final int WALL = 3;
+
+
     private final int x[] = new int[ALL_DOTS];
     private final int y[] = new int[ALL_DOTS];
+
+    private int[][] grid = new int[B_WIDTH/DOT_SIZE+2][B_HEIGHT/DOT_SIZE+2];
 
     private int dots;
     private int apple_x;
     private int apple_y;
+    private int gridAppleX;
+    private int gridAppleY;
 
     private boolean leftDirection = false;
     private boolean rightDirection = true;
@@ -70,11 +80,22 @@ public class Board extends JPanel implements ActionListener {
 
     private void initGame() {
 
+        for(int i = 0; i < grid.length; i ++) {
+            for(int j = 0; j < grid[i].length; j ++) {
+                if(i == 0 || j == 0 || i == grid.length-1 || j == grid[i].length-1) {
+                    grid[i][j] = WALL;
+                } else {
+                    grid[i][j] = EMPTY;
+                }
+            }
+        }
+
         dots = 3;
 
         for (int z = 0; z < dots; z++) {
-            x[z] = 50 - z * 10;
-            y[z] = 50;
+            x[z] = 20 - z * 10;
+            y[z] = 20;
+            grid[3-z][3] = SNAKE;
         }
 
         locateApple();
@@ -95,6 +116,18 @@ public class Board extends JPanel implements ActionListener {
         if (inGame) {
 
             g.drawImage(apple, apple_x, apple_y, this);
+
+//            for(int i = 1; i < grid.length-1; i ++){
+//                for(int j = 1; j < grid[i].length-1; j ++) {
+//
+//                    if(grid[i][j] == SNAKE) {
+//                        g.drawImage(head, i*10, j*10, this);
+//                    } else if(grid[i][j] == FOOD) {
+//                       g.drawImage(ball, i*10, j*10, this);
+//                    }
+//                }
+//            }
+
 
             for (int z = 0; z < dots; z++) {
                 if (z == 0) {
@@ -135,25 +168,84 @@ public class Board extends JPanel implements ActionListener {
     private void move() {
 
         for (int z = dots; z > 0; z--) {
+            //grid[(x[z]/10)][(y[z]/10)] = grid[(x[z-1]/10)][(y[z-1]/10)];
             x[z] = x[(z - 1)];
             y[z] = y[(z - 1)];
         }
+        grid[(x[dots]/10+1)][(y[dots]/10)+1] = EMPTY;
+
 
         if (leftDirection) {
             x[0] -= DOT_SIZE;
+            grid[(x[0]/10)+1][(y[0]/10)+1] = SNAKE;
         }
 
         if (rightDirection) {
             x[0] += DOT_SIZE;
+            grid[(x[0]/10)+1][(y[0]/10)+1] = SNAKE;
         }
 
         if (upDirection) {
             y[0] -= DOT_SIZE;
+            grid[(x[0]/10)+1][(y[0]/10)+1] = SNAKE;
         }
 
         if (downDirection) {
             y[0] += DOT_SIZE;
+            grid[(x[0]/10)+1][(y[0]/10)+1] = SNAKE;
         }
+    }
+
+    public int getLeft() {
+        if(leftDirection) {
+            return grid[x[0]/10+1][y[0]/10+1+1];
+        } else if (rightDirection) {
+            return grid[x[0]/10+1][y[0]/10+1-1];
+        } else if (upDirection) {
+            return grid[x[0]/10+1-1][y[0]/10+1];
+        } else {
+            return grid[x[0]/10+1+1][y[0]/10+1];
+        }
+    }
+
+    public int getRight() {
+        if(leftDirection) {
+            return grid[x[0]/10+1][y[0]/10+1-1];
+        } else if (rightDirection) {
+            return grid[x[0]/10+1][y[0]/10+1+1];
+        } else if (upDirection) {
+            return grid[x[0]/10+1+1][y[0]/10+1];
+        } else {
+            return grid[x[0]/10+1-1][y[0]/10+1];
+        }
+    }
+
+    public int getFront() {
+        if(leftDirection) {
+            return grid[x[0]/10+1-1][y[0]/10+1];
+        } else if (rightDirection) {
+            return grid[x[0]/10+1+1][y[0]/10+1];
+        } else if (upDirection) {
+            return grid[x[0]/10+1][y[0]/10+1-1];
+        } else {
+            return grid[x[0]/10+1][y[0]/10+1+1];
+        }
+    }
+
+    public boolean appleLeft() {
+        return x[0]/10+1 < gridAppleX;
+    }
+
+    public boolean appleRight() {
+        return x[0]/10+1 > gridAppleX;
+    }
+
+    public boolean appleUp() {
+        return y[0]/10+1 > gridAppleY;
+    }
+
+    public boolean appleDown() {
+        return y[0]/10+1 < gridAppleY;
     }
 
     private void checkCollision() {
@@ -187,22 +279,30 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void locateApple() {
+        int rx = (int) (Math.random() * RAND_POS);
+        int ry = (int) (Math.random() * RAND_POS);
+        while(grid[rx+1][ry+1] == SNAKE) {
+            rx = (int) (Math.random() * RAND_POS);
+            ry = (int) (Math.random() * RAND_POS);
+        }
 
-        int r = (int) (Math.random() * RAND_POS);
-        apple_x = ((r * DOT_SIZE));
+        apple_x = ((rx * DOT_SIZE));
+        apple_y = ((ry * DOT_SIZE));
 
-        r = (int) (Math.random() * RAND_POS);
-        apple_y = ((r * DOT_SIZE));
+        gridAppleX = rx+1;
+        gridAppleY = ry+1;
+        grid[rx+1][ry+1] = FOOD;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (inGame) {
 
             checkApple();
             checkCollision();
-            move();
+            if(inGame) {
+                move();
+            }
         }
 
         repaint();

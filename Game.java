@@ -1,9 +1,23 @@
-import java.awt.Canvas;
-import java.awt.Graphics2D;
-import javax.swing.JFrame;
+import ml.classifiers.GeneticNN;
 
+import javax.swing.*;
+import java.awt.*;
 
 public class Game {
-    private Board board;
+
+    public Game() {
+
+    }
+
+    public static void main(String[] args) {
+        Snake snake = new Snake();
+        GeneticNN network = new GeneticNN(4, 3);
+
+        EventQueue.invokeLater(() -> {
+            JFrame ex = snake;
+            System.out.println(snake.appleLeft());
+            ex.setVisible(true);
+        });
+    }
 
 }
