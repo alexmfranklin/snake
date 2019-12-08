@@ -29,6 +29,7 @@ public class Board extends JPanel implements ActionListener {
 
     private int[][] grid = new int[B_WIDTH/DOT_SIZE+2][B_HEIGHT/DOT_SIZE+2];
 
+    private int runtime = 30;
     private int dots;
     private int apple_x;
     private int apple_y;
@@ -167,6 +168,7 @@ public class Board extends JPanel implements ActionListener {
         g.setColor(Color.white);
         g.setFont(small);
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+        timer.stop();
     }
 
     private void checkApple() {
@@ -338,7 +340,7 @@ public class Board extends JPanel implements ActionListener {
                 determineMove();
                 move();
                 elapsedTime = System.currentTimeMillis()/1000 - start;
-                if(elapsedTime > 240){
+                if(elapsedTime > runtime){
                     endGame();
                 }
 
