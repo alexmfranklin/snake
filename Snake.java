@@ -3,11 +3,6 @@ import javax.swing.JFrame;
 
 public class Snake extends JFrame {
 
-    public static final int EMPTY = 0;
-    public static final int SNAKE = 1;
-    public static final int FOOD = 2;
-    public static final int WALL = 3;
-
     private Board board;
 
     public Snake() throws AWTException {
@@ -20,7 +15,7 @@ public class Snake extends JFrame {
     }
 
     private void initUI() throws AWTException {
-        Board b = new Board();
+        Board b = new Board(true);
         this.board = b;
         add(b);
 

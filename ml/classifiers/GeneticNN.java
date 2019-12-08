@@ -6,9 +6,10 @@ import ml.data.Example;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
 
-public class GeneticNN {
+public class GeneticNN implements Comparable<GeneticNN>{
     private double eta = .1;
     private int iterations = 200;
     private int numHidden;
@@ -22,6 +23,7 @@ public class GeneticNN {
     private DataSet test;
     public static int LEFT = 0;
     public static int RIGHT = 1;
+    public int fitness=0;
 
     /**
      * @param numHidden
@@ -180,6 +182,36 @@ public class GeneticNN {
         updateOutput();
         return theOutput;
     }
+
+    public Integer fitness(){
+        return fitness;
+    }
+
+    public void increaseFitness(){
+        fitness +=1;
+    }
+    public static Comparator<GeneticNN> byFitness(){
+
+        // lambda expression takes two terms compares them by weight and returns
+        // the result for the reverse weight order
+        Comparator<GeneticNN> fitComp =  (GeneticNN one, GeneticNN two) -> {
+
+            // creates Long objects so that the weights may be compared
+            Integer fitOne = one.fitness();
+            Integer fitTwo = two.fitness();
+
+            // returns comparator
+            return fitOne.compareTo(fitTwo);
+        };
+
+        return fitComp;
+    }
+
+    @Override
+    public int compareTo(GeneticNN network) {
+        return -this.fitness().compareTo(network.fitness());
+    }
+
 
 //    @Override
 //    public double confidence(Example example) {

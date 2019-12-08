@@ -50,9 +50,14 @@ public class Board extends JPanel implements ActionListener {
     private int numFeatures;
     int[] features;
     Robot r = new Robot();
+    private boolean earlyBreed;
 
-    public Board() throws AWTException {
+    long start;
+    long elapsedTime;
 
+
+    public Board(boolean earlyBreed) throws AWTException {
+        this.earlyBreed = earlyBreed;
         initBoard();
     }
 
@@ -94,16 +99,16 @@ public class Board extends JPanel implements ActionListener {
         dots = 3;
 
         for (int z = 0; z < dots; z++) {
-            x[z] = 20 - z * 10;
-            y[z] = 20;
-            grid[3-z][3] = SNAKE;
+            x[z] = 50 - z * 10;
+            y[z] = 50;
+            grid[4-z][4] = SNAKE;
         }
 
         locateApple();
 
         timer = new Timer(DELAY, this);
         timer.start();
-
+        start = System.currentTimeMillis()/1000;
     }
 
     public void setNetwork(GeneticNN theNetwork){
@@ -116,6 +121,9 @@ public class Board extends JPanel implements ActionListener {
         doDrawing(g);
     }
 
+    public void endGame(){
+        inGame = false;
+    }
     private void doDrawing(Graphics g) {
 
         if (inGame) {
@@ -164,7 +172,8 @@ public class Board extends JPanel implements ActionListener {
     private void checkApple() {
 
         if ((x[0] == apple_x) && (y[0] == apple_y)) {
-
+            start = System.currentTimeMillis()/1000;
+            network.increaseFitness();
             dots++;
             locateApple();
         }
@@ -328,11 +337,16 @@ public class Board extends JPanel implements ActionListener {
             if(inGame) {
                 determineMove();
                 move();
+                elapsedTime = System.currentTimeMillis()/1000 - start;
+                if(elapsedTime > 240){
+                    endGame();
+                }
 
             }
         }
 
         repaint();
+
 
 
     }
