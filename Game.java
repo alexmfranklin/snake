@@ -8,9 +8,9 @@ import java.util.Random;
 
 public class Game {
     private static int numFeatures = 4;
-    private static int numNetworks = 24;
+    private static int numNetworks = 10;
     private static int numGenerations = 10;
-    private static int numChildren = 24;
+    private static int numChildren = 10;
 
     private int total = numNetworks;
     private int numLayers = 8;
@@ -39,6 +39,10 @@ public class Game {
             networkList2 = game.nextGen(networkList);
             game.runGen(networkList2);
             networkList = networkList2;
+            //mutate all networks using mutation function (mutates all weights a little)
+            for(GeneticNN net : networkList) {
+                net.mutate(0.1);
+            }
         }
     }
 
