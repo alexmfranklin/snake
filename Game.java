@@ -8,14 +8,14 @@ import java.util.Random;
 
 public class Game {
     private static int numFeatures = 4;
-    private static int numNetworks = 10;
+    private static int numNetworks = 24;
     private static int numGenerations = 10;
     private static int numChildren = 24;
 
     private int total = numNetworks;
-    private int numLayers = 4;
+    private int numLayers = 8;
     private int numHidden = 25;
-    private int numPartners = 2;
+    private int numPartners = 4;
 
     private Random r = new Random();
 
@@ -90,7 +90,7 @@ public class Game {
            for(int i = numNetworks-2; i >= numNetworks-2 - numPartners; i-- ){
             GeneticNN net1 = networkList.get(numNetworks-1);
             GeneticNN net2 = networkList.get(i);
-            ArrayList<GeneticNN> someChildren = crossover(net1, net2, 6);
+            ArrayList<GeneticNN> someChildren = crossover(net1, net2, numChildren/numPartners);
             for(int j = 0; j < someChildren.size(); j ++) {
                 allTheChildren.add(someChildren.get(j));
             }

@@ -33,7 +33,7 @@ public class Board extends JPanel implements ActionListener {
     private int[][] grid = new int[B_WIDTH/DOT_SIZE+2][B_HEIGHT/DOT_SIZE+2];
 
     public int appleCount =0;
-    private int runtime = 5;
+    private int runtime = 15;
     private int dots;
     private int apple_x;
     private int apple_y;
