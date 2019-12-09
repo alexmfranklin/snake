@@ -54,7 +54,7 @@ public class Board extends JPanel implements ActionListener {
     private Image apple;
     private Image head;
     private JFrame frame;
-
+    private int moveType = 0;
     private GeneticNN network;
     private int numFeatures;
     int[] features;
@@ -176,7 +176,10 @@ public class Board extends JPanel implements ActionListener {
             gameOver(g);
         }
     }
-
+    public void setMoveType(int i){
+        if(i == 1) moveType = 1;
+        else moveType =0;
+    }
     private void gameOver(Graphics g) {
 
         String msg = "Game Over";
@@ -308,7 +311,6 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void checkCollision() {
-
         for (int z = dots; z > 0; z--) {
 
             if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
@@ -454,8 +456,9 @@ public class Board extends JPanel implements ActionListener {
         features = new int[numFeatures];
 
         setExample(features);
+        if(moveType == 1){
         double move[] = network.classify2(features);
-
+        
         if( move[0] == 1 && move[1] == 1){
             if(this.isLeftDirection()){
                 this.pressKey(KeyEvent.VK_DOWN);
@@ -487,15 +490,56 @@ public class Board extends JPanel implements ActionListener {
             }
         }
     }
+
+    else{
+        double move = network.classify(features);
+        if( move == -1){
+          
+            if(this.isLeftDirection()){
+                this.pressKey(KeyEvent.VK_DOWN);
+            }
+            else if(this.isRightDirection()){
+                this.pressKey(KeyEvent.VK_UP);
+            }
+            else if(this.isUpDirection()){
+                this.pressKey(KeyEvent.VK_LEFT);
+            }
+            else{
+                this.pressKey(KeyEvent.VK_RIGHT);
+            }
+
+        }
+
+        else if(move == 1){
+            if(this.isLeftDirection()){
+                this.pressKey(KeyEvent.VK_UP);
+            }
+            else if(this.isRightDirection()){
+                this.pressKey(KeyEvent.VK_DOWN);
+            }
+            else if(this.isUpDirection()){
+                this.pressKey(KeyEvent.VK_RIGHT);
+            }
+            else{
+                this.pressKey(KeyEvent.VK_LEFT);
+            }
+    
+    }
+}
+    }
     private void setExample(int[] features){
-        features[0] = ((this.getFront() == SNAKE || this.getFront() == WALL) ? 1 : 0);
-        features[1] = ((this.getLeft() == SNAKE || this.getLeft() == WALL) ? 1 : 0);
-        features[2] = ((this.getRight() == SNAKE || this.getRight() == WALL) ? 1 : 0);
+        features[0] = ((this.getFront() == SNAKE) ? 1 : 0);
+        features[1] = ((this.getLeft() == SNAKE) ? 1 : 0);
+        features[2] = ((this.getRight() == SNAKE) ? 1 : 0);
+        features[3] = ((this.getFront() == WALL) ? 1 : 0);
+        features[4] = ((this.getLeft() == WALL) ? 1 : 0);
+        features[5] = ((this.getRight() == WALL) ? 1 : 0);
         double currentDist= Math.sqrt(Math.pow(y[0]/10+1 - gridAppleY,2) + Math.pow(x[0]/10+1 - gridAppleX,2));
         double oldDist = Math.sqrt(Math.pow((double)xDistApple,2) + Math.pow( (double) yDistApple,2));
-        if(currentDist < oldDist) features[3] = 1;
-        else features[3] = 0; 
+        if(currentDist < oldDist) features[6] = 1;
+        else features[6] = 0; 
        
     }
 
 }
+

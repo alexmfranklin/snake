@@ -7,10 +7,11 @@ import java.util.Collections;
 import java.util.Random;
 
 public class Game {
-    private static int numFeatures = 4;
+    private static int numFeatures = 7;
     private static int numNetworks = 24;
     private static int numGenerations = 10;
     private static int numChildren = 24;
+    private static int moveType = 1;
 
     private int total = numNetworks;
     private int numLayers = 8;
@@ -46,7 +47,7 @@ public class Game {
         for (int i = 0; i < numNetworks; i++) {
             Snake snake = new Snake();
             Board board  = snake.getBoard();
-
+            board.setMoveType(moveType);
             board.setNumFeatures(numFeatures);
 
             board.setNetwork(networkList.get(i));
@@ -109,15 +110,21 @@ public class Game {
                 double[][] input = net1.getInputTable();
                 double[][][] left = net1.getLayerTable(rand, GeneticNN.LEFT);
                 double[][][] right = net2.getLayerTable(rand, GeneticNN.RIGHT);
-                double[][] output = net1.getOutputTable2();
-                GeneticNN newNetwork = new GeneticNN(input, left, right, rand, output, numLayers, numHidden);
+                
+                double[] output = net1.getOutputTable();
+                double[][] output2 = net1.getOutputTable2();
+                
+               
+                GeneticNN newNetwork = new GeneticNN(input, left, right, rand, output, output2, moveType, numLayers, numHidden);
                 networks.add(newNetwork);
            } else { 
                 double[][] input = net2.getInputTable();
                 double[][][] left = net2.getLayerTable(rand, GeneticNN.LEFT);
                 double[][][] right = net1.getLayerTable(rand, GeneticNN.RIGHT);
-                double[][] output = net2.getOutputTable2();
-                GeneticNN newNetwork = new GeneticNN(input, left, right, rand, output, numLayers, numHidden);
+                double[] output = net2.getOutputTable();
+                double[][] output2 = net2.getOutputTable2();
+
+                GeneticNN newNetwork = new GeneticNN(input, left, right, rand, output, output2, moveType, numLayers, numHidden);
 
                 networks.add(newNetwork);
             }

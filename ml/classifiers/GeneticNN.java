@@ -29,13 +29,21 @@ public class GeneticNN implements Comparable<GeneticNN>{
         numLayers = layers;
     }
 
-    public GeneticNN(double[][] input, double[][][] left, double[][][] gene, int cross_point, double[][] outputtab, int numHidden, int layers) {
+    public GeneticNN(double[][] input, double[][][] left, double[][][] gene, int cross_point, double[] outputTable, double[][] outputtab,int outputType, int numHidden, int layers) {
         this.numLayers = layers;
         this.numHidden = numHidden;
         layerTable = new double[layers][numHidden+1][numHidden+1];
-        outputTable2 = new double[numHidden+1][output.length];
+       
         inputTable = input;
-        outputTable2 = outputtab;
+
+        if(outputType == 1){ 
+            outputTable2 = new double[numHidden+1][output.length];
+            outputTable2 = outputtab;
+        }
+        else{
+            this.outputTable = new double[numHidden+1];
+            this.outputTable = outputTable;
+        } 
        
             layerTable = left;
         
