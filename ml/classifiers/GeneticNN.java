@@ -33,6 +33,21 @@ public class GeneticNN implements Comparable<GeneticNN>{
         numLayers = layers;
     }
 
+    public GeneticNN(double[][] input, double[][][] left, double[][][] right, double[] output, int numHidden, int layers) {
+        layerTable = new double[layers][numHidden+1][numHidden+1];
+        inputTable = input;
+        outputTable = output;
+        for(int i = 0; i < left.length; i ++) {
+            layerTable[i] = left[i];
+        }
+        for(int i = left.length; i < left.length+right.length; i ++) {
+            layerTable[i] = right[i-left.length];
+        }
+        this.numLayers = layers;
+        this.numHidden = numHidden;
+        hiddenNodes = new double[numLayers][numHidden+1];
+    }
+
     /**
      * @param eta
      */
@@ -101,6 +116,10 @@ public class GeneticNN implements Comparable<GeneticNN>{
 
 
         }
+    }
+
+    public int getNumLayers() {
+        return numLayers;
     }
 
     /**

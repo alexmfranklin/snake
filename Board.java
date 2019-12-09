@@ -5,9 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.Timer;
+import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -23,13 +21,14 @@ public class Board extends JPanel implements ActionListener {
     private static final int FOOD = 2;
     private static final int WALL = 3;
 
+    public static int numFinished = 0;
 
     private final int x[] = new int[ALL_DOTS];
     private final int y[] = new int[ALL_DOTS];
 
     private int[][] grid = new int[B_WIDTH/DOT_SIZE+2][B_HEIGHT/DOT_SIZE+2];
 
-    private int runtime = 30;
+    private int runtime = 3;
     private int dots;
     private int apple_x;
     private int apple_y;
@@ -46,6 +45,7 @@ public class Board extends JPanel implements ActionListener {
     private Image ball;
     private Image apple;
     private Image head;
+    private JFrame frame;
 
     private GeneticNN network;
     private int numFeatures;
@@ -125,6 +125,11 @@ public class Board extends JPanel implements ActionListener {
     public void endGame(){
         inGame = false;
     }
+
+    public void setJFrame(JFrame frame) {
+        this.frame = frame;
+    }
+
     private void doDrawing(Graphics g) {
 
         if (inGame) {
@@ -169,6 +174,9 @@ public class Board extends JPanel implements ActionListener {
         g.setFont(small);
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
         timer.stop();
+        numFinished ++;
+        frame.setVisible(false);
+        frame.dispose();
     }
 
     private void checkApple() {
