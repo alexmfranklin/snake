@@ -111,7 +111,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
             // initialize and fill hidden nodes array which contains the values of the nodes
             hiddenNodes = new double[numLayers][numHidden];
             for (int j = 0; j < numLayers; j++) {
-                for (int i = 0; i < hiddenNodes.length; i++) {
+                for (int i = 0; i < numHidden; i++) {
                     hiddenNodes[j][i] = 0;
                 }
             }
@@ -166,7 +166,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
         // calculate output value based on hidden nodes and weights coming out of them to the output node
 
  
-        for (int i = 0; i < hiddenNodes.length; i++) {
+        for (int i = 0; i < numHidden; i++) {
             for (int j = 0; j < output.length; j++) {
             output[j] += outputTable2[i][j] * hiddenNodes[numLayers-1][i];
         }
