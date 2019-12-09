@@ -15,7 +15,7 @@ public class Snake extends JFrame {
     }
 
     private void initUI() throws AWTException {
-        Board b = new Board(true);
+        Board b = new Board();
         this.board = b;
         add(b);
 

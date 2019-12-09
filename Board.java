@@ -9,6 +9,10 @@ import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -3199194738524258272L;
     private final int B_WIDTH = 300;
     private final int B_HEIGHT = 300;
     private final int DOT_SIZE = 10;
@@ -35,7 +39,10 @@ public class Board extends JPanel implements ActionListener {
     private int apple_y;
     private int gridAppleX;
     private int gridAppleY;
+    private int xDistApple;
+    private int yDistApple;
 
+    private Boolean hasDied = false;
     private boolean leftDirection = false;
     private boolean rightDirection = true;
     private boolean upDirection = false;
@@ -52,7 +59,7 @@ public class Board extends JPanel implements ActionListener {
     private int numFeatures;
     int[] features;
     Robot r = new Robot();
-    private boolean earlyBreed;
+
 
     long gameStart;
     long gameEnd;
@@ -60,8 +67,8 @@ public class Board extends JPanel implements ActionListener {
     long elapsedTime;
 
 
-    public Board(boolean earlyBreed) throws AWTException {
-        this.earlyBreed = earlyBreed;
+    public Board() throws AWTException {
+ 
         initBoard();
     }
 
@@ -160,7 +167,8 @@ public class Board extends JPanel implements ActionListener {
                     g.drawImage(ball, x[z], y[z], this);
                 }
             }
-
+            yDistApple = Math.abs(y[0]/10+1 - gridAppleY);
+            xDistApple = Math.abs(x[0]/10+1 - gridAppleX);
             Toolkit.getDefaultToolkit().sync();
 
         } else {
@@ -179,7 +187,9 @@ public class Board extends JPanel implements ActionListener {
         g.setFont(small);
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
         gameEnd = System.currentTimeMillis()/1000 - gameStart;
-        network.increaseFitness(appleCount, gameEnd/3);
+        if(hasDied == true) appleCount = 0;
+        else appleCount++;
+        network.increaseFitness(appleCount);
         timer.stop();
 
         numFinished ++;
@@ -303,23 +313,29 @@ public class Board extends JPanel implements ActionListener {
 
             if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
                 inGame = false;
+                hasDied = true;
             }
         }
 
         if (y[0] >= B_HEIGHT) {
             inGame = false;
+            hasDied = true;
+            
         }
 
         if (y[0] < 0) {
             inGame = false;
+            hasDied = true;
         }
 
         if (x[0] >= B_WIDTH) {
             inGame = false;
+            hasDied = true;
         }
 
         if (x[0] < 0) {
             inGame = false;
+            hasDied = true;
         }
 
         if (!inGame) {
@@ -353,8 +369,11 @@ public class Board extends JPanel implements ActionListener {
             checkCollision();
 
             if(inGame) {
+               
                 determineMove();
                 move();
+                yDistApple = Math.abs(y[0]/10+1 - gridAppleY);
+                xDistApple = Math.abs(x[0]/10+1 - gridAppleX);
                 elapsedTime = System.currentTimeMillis()/1000 - start;
                 if(elapsedTime > runtime){
                     endGame();
@@ -435,9 +454,9 @@ public class Board extends JPanel implements ActionListener {
         features = new int[numFeatures];
 
         setExample(features);
-        double move = network.classify(features);
+        double move[] = network.classify2(features);
 
-        if( move < -1/3){
+        if( move[0] == 1 && move[1] == 1){
             if(this.isLeftDirection()){
                 this.pressKey(KeyEvent.VK_DOWN);
             }
@@ -453,7 +472,7 @@ public class Board extends JPanel implements ActionListener {
 
         }
 
-        else if(move < 1/3){
+        else if(move[0] == -1 && move[1] == -1){
             if(this.isLeftDirection()){
                 this.pressKey(KeyEvent.VK_UP);
             }
@@ -469,16 +488,14 @@ public class Board extends JPanel implements ActionListener {
         }
     }
     private void setExample(int[] features){
-        features[0] = ((this.getFront() == SNAKE) ? 1 : 0);
-        features[1] = ((this.getLeft() == SNAKE) ? 1 : 0);
-        features[2] = ((this.getRight() == SNAKE) ? 1 : 0);
-        features[3] = ((this.getFront() == WALL) ? 1 : 0);
-        features[4] = ((this.getLeft() == WALL) ? 1 : 0);
-        features[5] = ((this.getRight() == WALL) ? 1 : 0);
-        features[6] = ((this.appleUp()) ? 1 : 0);
-        features[7] = ((this.appleDown()) ? 1 : 0);
-        features[8] = ((this.appleLeft()) ? 1 : 0);
-        features[9] = ((this.appleRight()) ? 1 : 0);
+        features[0] = ((this.getFront() == SNAKE || this.getFront() == WALL) ? 1 : 0);
+        features[1] = ((this.getLeft() == SNAKE || this.getLeft() == WALL) ? 1 : 0);
+        features[2] = ((this.getRight() == SNAKE || this.getRight() == WALL) ? 1 : 0);
+        double currentDist= Math.sqrt(Math.pow(y[0]/10+1 - gridAppleY,2) + Math.pow(x[0]/10+1 - gridAppleX,2));
+        double oldDist = Math.sqrt(Math.pow((double)xDistApple,2) + Math.pow( (double) yDistApple,2));
+        if(currentDist < oldDist) features[3] = 1;
+        else features[3] = 0; 
+       
     }
 
 }
