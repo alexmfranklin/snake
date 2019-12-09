@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Random;
 
 public class Game {
-    private static int numFeatures = 7;
+    private static int numFeatures = 5;
     private static int numNetworks = 24;
     private static int numGenerations = 10;
     private static int numChildren = 24;

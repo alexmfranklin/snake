@@ -528,16 +528,20 @@ public class Board extends JPanel implements ActionListener {
 }
     }
     private void setExample(int[] features){
-        features[0] = ((this.getFront() == SNAKE) ? 1 : 0);
-        features[1] = ((this.getLeft() == SNAKE) ? 1 : 0);
-        features[2] = ((this.getRight() == SNAKE) ? 1 : 0);
-        features[3] = ((this.getFront() == WALL) ? 1 : 0);
-        features[4] = ((this.getLeft() == WALL) ? 1 : 0);
-        features[5] = ((this.getRight() == WALL) ? 1 : 0);
+        features[0] = ((this.getFront() == SNAKE || this.getFront() == WALL) ? -1 : 1);
+        features[1] = ((this.getLeft() == SNAKE || this.getLeft() == WALL) ? -1 : 1);
+        features[2] = ((this.getRight() == SNAKE || this.getRight() == WALL) ? -1 : 1);
+        // features[0] = ((this.getFront() == SNAKE) ? 1 : 0);
+        // features[1] = ((this.getLeft() == SNAKE) ? 1 : 0);
+        // features[2] = ((this.getRight() == SNAKE) ? 1 : 0);
+        // features[3] = ((this.getFront() == WALL) ? 1 : 0);
+        // features[4] = ((this.getLeft() == WALL) ? 1 : 0);
+        // features[5] = ((this.getRight() == WALL) ? 1 : 0);
         double currentDist= Math.sqrt(Math.pow(y[0]/10+1 - gridAppleY,2) + Math.pow(x[0]/10+1 - gridAppleX,2));
         double oldDist = Math.sqrt(Math.pow((double)xDistApple,2) + Math.pow( (double) yDistApple,2));
-        if(currentDist < oldDist) features[6] = 1;
-        else features[6] = 0; 
+        if(currentDist < oldDist) features[3] = 1;
+        else features[3] = -1; 
+
        
     }
 
