@@ -14,7 +14,7 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = 900;
     private final int RAND_POS = 29;
-    private final int DELAY = 140;
+    private final int DELAY = 100;
 
     private static final int EMPTY = 0;
     private static final int SNAKE = 1;
@@ -28,7 +28,8 @@ public class Board extends JPanel implements ActionListener {
 
     private int[][] grid = new int[B_WIDTH/DOT_SIZE+2][B_HEIGHT/DOT_SIZE+2];
 
-    private int runtime = 3;
+    public int appleCount =0;
+    private int runtime = 5;
     private int dots;
     private int apple_x;
     private int apple_y;
@@ -53,6 +54,8 @@ public class Board extends JPanel implements ActionListener {
     Robot r = new Robot();
     private boolean earlyBreed;
 
+    long gameStart;
+    long gameEnd;
     long start;
     long elapsedTime;
 
@@ -109,7 +112,9 @@ public class Board extends JPanel implements ActionListener {
 
         timer = new Timer(DELAY, this);
         timer.start();
+
         start = System.currentTimeMillis()/1000;
+        gameStart = System.currentTimeMillis()/1000;
     }
 
     public void setNetwork(GeneticNN theNetwork){
@@ -173,7 +178,10 @@ public class Board extends JPanel implements ActionListener {
         g.setColor(Color.white);
         g.setFont(small);
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+        gameEnd = System.currentTimeMillis()/1000 - gameStart;
+        network.increaseFitness(appleCount, gameEnd/3);
         timer.stop();
+
         numFinished ++;
         frame.setVisible(false);
         frame.dispose();
@@ -183,7 +191,7 @@ public class Board extends JPanel implements ActionListener {
 
         if ((x[0] == apple_x) && (y[0] == apple_y)) {
             start = System.currentTimeMillis()/1000;
-            network.increaseFitness();
+            appleCount++;
             dots++;
             locateApple();
         }

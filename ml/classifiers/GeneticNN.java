@@ -24,6 +24,8 @@ public class GeneticNN implements Comparable<GeneticNN>{
     public static int LEFT = 0;
     public static int RIGHT = 1;
     public int fitness=0;
+    private Random r = new Random();
+    private int prob = 15;
 
     /**
      * @param numHidden
@@ -181,8 +183,18 @@ public class GeneticNN implements Comparable<GeneticNN>{
         else if(direction == RIGHT){
             double[][][] geneTable = new double[numLayers-cross_point][numHidden+1][numHidden+1];
             for(int i = cross_point; i < numLayers; i++){
+                if(r.nextInt(prob) == 0) {
+                    double[][] mutatedTable = new double[numHidden+1][numHidden+1];
+                    for(int x = 0; x < layerTable[i].length; x ++) {
+                        for(int y = 0; y < layerTable[i][0].length; y ++) {
+                            mutatedTable[x][y] = layerTable[i][x][y] + r.nextDouble()*20-10;
+                        }
+                    }
+                    geneTable[i-cross_point] = mutatedTable;
+                } else {
+                    geneTable[i - cross_point] = layerTable[i];
+                }
 
-                geneTable[i-cross_point] = layerTable[i];
 
             }
             return geneTable;
@@ -206,8 +218,8 @@ public class GeneticNN implements Comparable<GeneticNN>{
         return fitness;
     }
 
-    public void increaseFitness(){
-        fitness +=1;
+    public void increaseFitness(int count, long time){
+        fitness = count + (int) time;
     }
     public static Comparator<GeneticNN> byFitness(){
 

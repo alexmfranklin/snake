@@ -84,7 +84,7 @@ public class Game {
             }
             return allTheChildren;
         } else {
-            allTheChildren = crossover(networkList.get(numNetworks-2), networkList.get(numNetworks-1), numChildren);
+            allTheChildren = crossover(networkList.get(0), networkList.get(1), numChildren);
             return allTheChildren;
         }
     }
@@ -108,7 +108,7 @@ public class Game {
                 double[][][] right = net1.getLayerTable(rand, GeneticNN.RIGHT);
                 double[] output = net1.getOutputTable();
                 GeneticNN newNetwork = new GeneticNN(input, left, right, output, 8, 6);
-                System.out.println("SDW");
+
                 networks.add(newNetwork);
             }
         }
