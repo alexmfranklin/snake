@@ -262,6 +262,26 @@ public class GeneticNN implements Comparable<GeneticNN>{
         return fitness;
     }
 
+    public void mutate(double mutationRate) {
+        for(int m = 0; m < numLayers; m ++) {
+            for (int i = 0; i < layerTable[m].length; i++) {
+                for (int j = 0; j < layerTable[m][i].length; j++) {
+                    double rand = r.nextDouble();
+                    if (rand < mutationRate) {
+                        layerTable[m][i][j] += r.nextGaussian() / 5;
+
+                        if (layerTable[m][i][j] > 1) {
+                            layerTable[m][i][j] = 1;
+                        }
+                        if (layerTable[m][i][j] < -1) {
+                            layerTable[m][i][j] = -1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void increaseFitness(int count){
         fitness = fitness * count;
     }
