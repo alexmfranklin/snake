@@ -77,7 +77,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
         for (int i = 0; i < numFeatures; i++) {
             for (int j = 0; j < numHidden; j++) {
                 // sets range of nextDouble to -.1-.1 and assigns value to table
-                inputTable[i][j] = random.nextDouble() * (random.nextInt(2)-1);
+                inputTable[i][j] = random.nextGaussian();
             }
 
         }
@@ -88,7 +88,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
                 for (int i = 0; i < numHidden+1; i++) {
                     for (int j = 0; j < numHidden+1; j++) {
                         // sets range of nextDouble to -.1-.1 and assigns value to table
-                        layerTable[l][i][j] =   random.nextDouble() / 5 - .1;
+                        layerTable[l][i][j] =  random.nextGaussian();
                     }
                 }
 
@@ -97,7 +97,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
             // initialize and fill output table which stores the weights between the hidden nodes and the output node
             outputTable = new double[numHidden+1];
             for (int k = 0; k < outputTable.length; k++) {
-                outputTable[k] =   random.nextDouble() / 5 - .1;
+                outputTable[k] = random.nextGaussian();
 
             }
 
@@ -105,7 +105,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
             for (int i = 0; i < numHidden+1; i++) {
                 for (int j = 0; j < output.length; j++) {
                     // sets range of nextDouble to -.1-.1 and assigns value to table
-                    outputTable2[i][j] =   random.nextDouble() / 5 - .1;
+                    outputTable2[i][j] =  random.nextGaussian();
                 }
     
             }
@@ -197,7 +197,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
 
     public double[][][] getLayerTable(int cross_point, int direction ){
         if(direction == LEFT){
-            if(r.nextInt(prob) == 0) {
+            if(r.nextInt(prob) == -3) {
             for(int x = 0; x < layerTable[0].length; x ++) {
                 for(int y = 0; y < layerTable[0][0].length; y ++) {
                
@@ -286,6 +286,33 @@ public class GeneticNN implements Comparable<GeneticNN>{
                 }
             }
         }
+        for(int i = 0; i < inputTable.length; i ++) {
+            for(int j = 0; j < inputTable[i].length; j ++) {
+                double rand = r.nextDouble();
+                if (rand < mutationRate) {
+                    inputTable[i][j] += r.nextGaussian() / 5;
+                }
+                if (inputTable[i][j] > 1) {
+                    inputTable[i][j] = 1;
+                }
+                if (inputTable[i][j] < -1) {
+                    inputTable[i][j] = -1;
+                }
+            }
+        }
+        for(int j = 0; j < outputTable.length; j ++) {
+            double rand = r.nextDouble();
+            if (rand < mutationRate) {
+                outputTable[j] += r.nextGaussian() / 5;
+            }
+            if (outputTable[j] > 1) {
+                outputTable[j] = 1;
+            }
+            if (outputTable[j] < -1) {
+                outputTable[j] = -1;
+            }
+
+        }
     }
     public void decreaseFitness(int count){
         fitness = fitness - count;
@@ -296,7 +323,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
     }
 
     public void deathFitness() {
-        fitness -= 800;
+        fitness -= 10;
     }
 
     public static Comparator<GeneticNN> byFitness(){
