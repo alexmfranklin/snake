@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 import java.util.Random;
 import javax.swing.*;
 
@@ -544,24 +543,17 @@ public class Board extends JPanel implements ActionListener {
         }
     }
     private void setExample(int[] features){
-        features[0] = ((this.getFront() == SNAKE || this.getFront() == WALL) ? 1 : 0);
-        features[1] = ((this.getLeft() == SNAKE || this.getLeft() == WALL) ? 1 : 0);
-        features[2] = ((this.getRight() == SNAKE || this.getRight() == WALL) ? 1 : 0);
-
+        features[0] = ((this.getFront() == SNAKE ) ? 1 : 0);
+        features[1] = ((this.getLeft() == SNAKE ) ? 1 : 0);
+        features[2] = ((this.getRight() == SNAKE ) ? 1 : 0);
         features[3] = ((this.appleLeft()) ? 1 : 0);
         features[4] = ((this.appleRight()) ? 1 : 0);
         features[5] = ((this.appleUp()) ? 1 : 0);
         features[6] = ((this.appleDown()) ? 1 : 0);
-//        if(leftDirection)  System.out.println("Going left");
-//        if(rightDirection)  System.out.println("Going right");
-//        if(upDirection)  System.out.println("Going up");
-//        if(downDirection)  System.out.println("Going down");
-//
-//        System.out.println("Left: " + features[3]);
-//        System.out.println("Right: " + features[4]);
-//        System.out.println("Up: " + features[5]);
-//        System.out.println("Down: " + features[6]);
-//        System.out.println("");
+        features[7] = (( this.getFront() == WALL) ? 1 : 0);
+        features[8] = ((this.getLeft() == SNAKE || this.getLeft() == WALL) ? 1 : 0);
+        features[9] = ((this.getRight() == WALL) ? 1 : 0);
+
 
     }
 

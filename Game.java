@@ -4,10 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
+
 
 public class Game {
-    private  int numFeatures = 7;
+    private  int numFeatures = 10;
     private  int numNetworks = 48;
     private  int numGenerations = 10;
 
@@ -17,7 +17,6 @@ public class Game {
     public int numHidden = 25;
     private int numPartners = 1;
 
-    private Random r = new Random();
 
     public static void main(String[] args) throws AWTException {
         Game game = new Game();
