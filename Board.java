@@ -196,8 +196,6 @@ public class Board extends JPanel implements ActionListener {
         network.increaseFitness(appleCount*100);
         timer.stop();
 
-        System.out.println(network.fitness());
-
         numFinished ++;
         frame.setVisible(false);
         frame.dispose();
