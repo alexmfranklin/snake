@@ -8,14 +8,14 @@ import java.util.Random;
 
 public class Game {
     private static int numFeatures = 7;
-    private static int numNetworks = 1;
-    private static int numGenerations = 1;
-    private static int numChildren = 1;
+    private static int numNetworks = 12;
+    private static int numGenerations = 10;
+    private static int numChildren = 12;
 
     private int total = numNetworks;
-    private int numLayers = 25;
+    private int numLayers = 10;
     private int numHidden = 25;
-    private int numPartners = 4;
+    private int numPartners = 6;
 
     private Random r = new Random();
 
@@ -27,29 +27,29 @@ public class Game {
         Game game = new Game();
 
         ArrayList<GeneticNN> networkList = new ArrayList<GeneticNN>();
-        ArrayList<GeneticNN> networkList2 = new ArrayList<GeneticNN>();
-        for(int i = 0; i < numChildren; i ++) {
+        
+        for (int i = 0; i < numChildren; i++) {
             GeneticNN network = new GeneticNN(25, 25);
             network.train(numFeatures);
             networkList.add(network);
         }
 
         game.runGen(networkList);
-        for(int g = 1; g < numGenerations; g ++) {
-            networkList2 = game.nextGen(networkList);
-            game.runGen(networkList2);
-            networkList = networkList2;
-            //mutate all networks using mutation function (mutates all weights a little)
-            for(GeneticNN net : networkList) {
-                net.mutate(0.1);
-            }
+        for (int g = 1; g < numGenerations; g++) {
+            ArrayList<GeneticNN> newNetList = game.nextGen(networkList);
+            networkList= newNetList;
+            game.runGen(networkList);
+            
+            
         }
+
+
     }
 
     public void runGen(ArrayList<GeneticNN> networkList) throws AWTException {
         for (int i = 0; i < numNetworks; i++) {
             Snake snake = new Snake();
-            Board board  = snake.getBoard();
+            Board board = snake.getBoard();
 
             board.setNumFeatures(numFeatures);
 
@@ -62,10 +62,11 @@ public class Game {
             });
         }
 
-        while(Board.numFinished < total){
+        while (Board.numFinished < total) {
             System.out.print("");
         }
-        total+= numNetworks;
+        
+        total += numNetworks;
 
     }
 
@@ -73,59 +74,78 @@ public class Game {
         ArrayList<GeneticNN> allTheChildren = new ArrayList<GeneticNN>();
 
         Collections.sort(networkList, GeneticNN.byFitness());
-        
-        System.out.println(networkList.get(numNetworks-2).fitness() + "'" + networkList.get(numNetworks-1).fitness());
-        if(networkList.get(0).fitness() == networkList.get(numNetworks-1).fitness()) {
-            for(int i = 0; i < numChildren/2; i ++) {
-                int index1 = r.nextInt(numNetworks);
-                int index2 = r.nextInt(numNetworks);
-                while (index2 == index1) {
-                    index2 = r.nextInt(numNetworks);
-                }
-                GeneticNN net1 = networkList.get(index1);
-                GeneticNN net2 = networkList.get(index2);
-                ArrayList<GeneticNN> someChildren = crossover(net1, net2, 2);
-                for(int j = 0; j < someChildren.size(); j ++) {
+
+       
+            for (int i = numNetworks - 2; i >= numNetworks - 2 - numPartners; i--) {
+                GeneticNN net1 = networkList.get(numNetworks - 1);
+                GeneticNN net2 = networkList.get(i);
+                ArrayList<GeneticNN> someChildren = crossover(net1, net2, numChildren / numPartners);
+                for (int j = 0; j < someChildren.size(); j++) {
                     allTheChildren.add(someChildren.get(j));
                 }
             }
             return allTheChildren;
-        } else {
-           for(int i = numNetworks-2; i >= numNetworks-2 - numPartners; i-- ){
-            GeneticNN net1 = networkList.get(numNetworks-1);
-            GeneticNN net2 = networkList.get(i);
-            ArrayList<GeneticNN> someChildren = crossover(net1, net2, numChildren/numPartners);
-            for(int j = 0; j < someChildren.size(); j ++) {
-                allTheChildren.add(someChildren.get(j));
-            }
-        }
-            return allTheChildren;
-        }
+
     }
 
-    private ArrayList<GeneticNN> crossover (GeneticNN net1, GeneticNN net2, int numChildren) {
+    private ArrayList<GeneticNN> crossover(GeneticNN net1, GeneticNN net2, int numChildren) {
 
         ArrayList<GeneticNN> networks = new ArrayList<GeneticNN>();
 
-        for(int i = 0; i < numChildren; i ++) {
-            int rand = r.nextInt(net1.getNumLayers()+2);
-            if (i < numChildren/2) {
-                double[][] input = net1.getInputTable();
-                double[][][] left = net1.getLayerTable(rand, GeneticNN.LEFT);
-                double[][][] right = net2.getLayerTable(rand, GeneticNN.RIGHT);
-                double[][] output = net1.getOutputTable2();
-                GeneticNN newNetwork = new GeneticNN(input, left, right, rand, output, numLayers, numHidden);
-                networks.add(newNetwork);
-           } else { 
-                double[][] input = net2.getInputTable();
-                double[][][] left = net2.getLayerTable(rand, GeneticNN.LEFT);
-                double[][][] right = net1.getLayerTable(rand, GeneticNN.RIGHT);
-                double[][] output = net2.getOutputTable2();
-                GeneticNN newNetwork = new GeneticNN(input, left, right, rand, output, numLayers, numHidden);
+        double[][] input1 = net1.getInputTable();
+        double[][] output1 = net1.getOutputTable();
+        double[][][] layers1 = net1.getLayerTable();
 
-                networks.add(newNetwork);
+        double[][] input2 = net2.getInputTable();
+        double[][] output2 = net2.getOutputTable();
+        double[][][] layers2 = net2.getLayerTable();
+
+        double[][] input = new double[input1.length][input1[0].length];
+        double[][] output = new double[output1.length][output1[0].length];
+        double[][][] layers = new double[layers1.length][layers1[0].length][layers1[0][0].length];
+        
+        for (int num = 0; num < numChildren; num++) {
+
+            int inputRandX = r.nextInt(input.length);
+            int inputRandY = r.nextInt(input[0].length);
+            for (int i = 0; i < input.length; i++) {
+                for (int j = 0; j < input[0].length; j++) {
+                    
+                    if (i < inputRandX || (i == inputRandX && j <= inputRandY))
+                        input[i][j] = input1[i][j];
+                    else
+                        input[i][j] = input2[i][j];
+                }
             }
+            
+            int outputRandX = r.nextInt(output.length);
+            int outputRandY = r.nextInt(output[0].length);
+            for (int i = 0; i < output.length; i++) {
+                for (int j = 0; j < output[0].length; j++) {
+                    if (i < outputRandX || (i == outputRandX && j <= outputRandY))
+                        output[i][j] = output1[i][j];
+                    else
+                        output[i][j] = output2[i][j];
+                }
+            }
+
+            int layersRandX = r.nextInt(layers[0].length);
+            int layersRandY = r.nextInt(layers[0][0].length);
+            for (int i = 0; i < layers.length; i++) {
+                for (int j = 0; j < layers[0].length; j++) {
+                    for (int k = 0; k < layers[0][0].length; k++) {
+                        if (j < layersRandX || (j == layersRandX && k <= layersRandY))
+                            layers[i][j][k] = layers1[i][j][k];
+                        else
+                            layers[i][j][k] = layers2[i][j][k];
+                    }
+                }
+            }
+            GeneticNN newNetwork = new GeneticNN(input, layers, output, numHidden, numLayers);
+            newNetwork.mutate(.99);
+            networks.add(newNetwork);
         }
+
         return networks;
     }
 

@@ -20,7 +20,7 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = 900;
     private final int RAND_POS = 29;
-    private final int DELAY = 60;
+    private final int DELAY = 140;
 
     private static final int EMPTY = 0;
     private static final int SNAKE = 1;
@@ -114,8 +114,8 @@ public class Board extends JPanel implements ActionListener {
         dots = 3;
 
         for (int z = 0; z < dots; z++) {
-            x[z] = r.nextInt(25)*10 - z * 10;
-            y[z] = r.nextInt(28)*10;
+            x[z] = (r.nextInt(25)+3) *10 - z * 10;
+            y[z] = (r.nextInt(28)+1)*10;
             grid[4-z][4] = SNAKE;
         }
 
@@ -347,7 +347,7 @@ public class Board extends JPanel implements ActionListener {
 
         for (int z = dots; z > 0; z--) {
 
-            if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
+            if ((z > 0) && (x[0] == x[z]) && (y[0] == y[z])) {
                 inGame = false;
                 hasDied = true;
             }
@@ -500,7 +500,7 @@ public class Board extends JPanel implements ActionListener {
         features = new int[numFeatures];
 
         setExample(features);
-        double move[] = network.classify2(features);
+        double move[] = network.classify(features);
         double confidence[] = network.confidence(features);
 //        System.out.println(Arrays.toString(move));
 //        System.out.println(Arrays.toString(confidence));
