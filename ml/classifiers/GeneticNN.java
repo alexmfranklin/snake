@@ -24,29 +24,16 @@ public class GeneticNN implements Comparable<GeneticNN>{
     /**
      * @param numHidden
      */
-    public GeneticNN(int numHidden,int layers) {
+    public GeneticNN(int numHidden,int layers, int numFeatures) {
         this.numHidden = numHidden;
+        this.numFeatures = numFeatures;
         numLayers = layers;
         output = new double[3];
-    }
-
-    
-
-    public GeneticNN(double[][] input, double[][][] layers, double[][] outputtab, int numHidden, int numlayers) {
-        output = new double[3];
-        this.numLayers = numlayers;
-        this.numHidden = numHidden;
         inputTable = new double[numFeatures][numHidden];
         layerTable = new double[numLayers][numHidden+1][numHidden+1];
         outputTable = new double[numHidden+1][output.length];
-
-
-
-        layerTable = layers;
-        outputTable = outputtab;
-        inputTable = input;
-    
         hiddenNodes = new double[numLayers][numHidden+1];
+       
         for (int j = 0; j < numLayers; j++) {
             for (int i = 0; i < numHidden+1; i++) {
                 hiddenNodes[j][i] = 0;                    // for bias case
@@ -57,21 +44,23 @@ public class GeneticNN implements Comparable<GeneticNN>{
             }
     }
 
+    
+
+ 
 
     /**
      * Train this classifier based on the data set
      *
      * @param size
      */
-    public void train(int size) {
+    public void train() {
         // init random
         Random random = new Random();
         
-        // get the number of possible features
-        numFeatures = size;
+        
 
         // initialize and fill input table which stores the weights between the input features and hidden weights
-        inputTable = new double[numFeatures][numHidden];
+        
         for (int i = 0; i < numFeatures; i++) {
             for (int j = 0; j < numHidden; j++) {
                 // sets range of nextDouble to -.1-.1 and assigns value to table
@@ -81,7 +70,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
         }
 
         if (numLayers != 0) {
-            layerTable = new double[numLayers][numHidden+1][numHidden+1];
+           
             for (int l = 0; l < numLayers; l++) {
                 for (int i = 0; i < numHidden+1; i++) {
                     for (int j = 0; j < numHidden+1; j++) {
@@ -94,7 +83,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
             }
           
 
-            outputTable = new double[numHidden+1][output.length];
+          
             for (int i = 0; i < numHidden+1; i++) {
                 for (int j = 0; j < output.length; j++) {
                     // sets range of nextDouble to -.1-.1 and assigns value to table
@@ -103,18 +92,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
     
             }
 
-            // initialize and fill hidden nodes array which contains the values of the nodes
-            hiddenNodes = new double[numLayers][numHidden+1];
-            for (int j = 0; j < numLayers; j++) {
-                for (int i = 0; i < numHidden+1; i++) {
-                    hiddenNodes[j][i] = 0;
-                    // for bias case
-                    if (i == numHidden) hiddenNodes[j][i] = 1;
-
-                    else hiddenNodes[j][i] = 0;
-                }
-            }
-
+        
 
         }
     }
@@ -226,12 +204,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
                     if (rand < mutationRate) {
                         layerTable[m][i][j] = r.nextGaussian() ;
 
-                        // if (layerTable[m][i][j] > 1) {
-                        //     layerTable[m][i][j] = 1;
-                        // }
-                        // if (layerTable[m][i][j] < -1) {
-                        //     layerTable[m][i][j] = -1;
-                        // }
+
                     }
                 }
             }
@@ -288,6 +261,47 @@ public class GeneticNN implements Comparable<GeneticNN>{
     @Override
     public int compareTo(GeneticNN network) {
         return -this.fitness().compareTo(network.fitness());
+    }
+
+    public void crossOver(double[][] input1, double[][][] layers1, double[][] output1, double[][] input2, double[][][] layers2, double[][] output2){
+       
+            // sets input weights
+            int inputRandX = r.nextInt(inputTable.length);
+            int inputRandY = r.nextInt(inputTable[0].length);
+            for (int i = 0; i < inputTable.length; i++) {
+                for (int j = 0; j < inputTable[0].length; j++) {
+                    
+                    if (i < inputRandX || (i == inputRandX && j <= inputRandY))
+                        inputTable[i][j] = input1[i][j];
+                    else
+                        inputTable[i][j] = input2[i][j];
+                }
+            }
+            //sets output weights
+            int outputRandX = r.nextInt(outputTable.length);
+            int outputRandY = r.nextInt(outputTable[0].length);
+            for (int i = 0; i < output.length; i++) {
+                for (int j = 0; j < outputTable[0].length; j++) {
+                    if (i < outputRandX || (i == outputRandX && j <= outputRandY))
+                        outputTable[i][j] = output1[i][j];
+                    else
+                        outputTable[i][j] = output2[i][j];
+                }
+            }
+
+            // sets the weights for the layers
+            int layersRandX = r.nextInt(layerTable[0].length);
+            int layersRandY = r.nextInt(layerTable[0][0].length);
+            for (int i = 0; i < layerTable.length; i++) {
+                for (int j = 0; j < layerTable[0].length; j++) {
+                    for (int k = 0; k < layerTable[0][0].length; k++) {
+                        if (j < layersRandX || (j == layersRandX && k <= layersRandY))
+                            layerTable[i][j][k] = layers1[i][j][k];
+                        else
+                            layerTable[i][j][k] = layers2[i][j][k];
+                    }
+                }
+            }
     }
 
 

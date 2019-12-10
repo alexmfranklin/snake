@@ -193,7 +193,7 @@ public class Board extends JPanel implements ActionListener {
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
         gameEnd = System.currentTimeMillis()/1000 - gameStart;
         if(hasDied == true) network.deathFitness();
-        network.increaseFitness(appleCount*100);
+        network.increaseFitness(appleCount*200);
         timer.stop();
 
         numFinished ++;
