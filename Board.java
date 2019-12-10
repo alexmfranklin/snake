@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
@@ -18,7 +19,7 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = 900;
     private final int RAND_POS = 29;
-    private final int DELAY = 100;
+    private final int DELAY = 1000;
 
     private static final int EMPTY = 0;
     private static final int SNAKE = 1;
@@ -33,7 +34,7 @@ public class Board extends JPanel implements ActionListener {
     private int[][] grid = new int[B_WIDTH/DOT_SIZE+2][B_HEIGHT/DOT_SIZE+2];
 
     public int appleCount =0;
-    private int runtime = 10;
+    private int runtime = 100;
     private int dots;
     private int apple_x;
     private int apple_y;
@@ -41,6 +42,9 @@ public class Board extends JPanel implements ActionListener {
     private int gridAppleY;
     private int xDistApple;
     private int yDistApple;
+    private int xDistAppleOld;
+    private int yDistAppleOld;
+
 
     private Boolean hasDied = false;
     private boolean leftDirection = false;
@@ -54,7 +58,7 @@ public class Board extends JPanel implements ActionListener {
     private Image apple;
     private Image head;
     private JFrame frame;
-    private int moveType = 0;
+
     private GeneticNN network;
     private int numFeatures;
     int[] features;
@@ -176,11 +180,9 @@ public class Board extends JPanel implements ActionListener {
             gameOver(g);
         }
     }
-    public void setMoveType(int i){
-        if(i == 1) moveType = 1;
-        else moveType =0;
-    }
+
     private void gameOver(Graphics g) {
+
 
         String msg = "Game Over";
         Font small = new Font("Helvetica", Font.BOLD, 14);
@@ -190,10 +192,11 @@ public class Board extends JPanel implements ActionListener {
         g.setFont(small);
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
         gameEnd = System.currentTimeMillis()/1000 - gameStart;
-        if(hasDied == true) appleCount = 0;
-        else appleCount++;
-        network.increaseFitness(appleCount);
+        if(hasDied == true) network.deathFitness();
+        network.increaseFitness(appleCount*10);
         timer.stop();
+
+        //System.out.println(network.fitness());
 
         numFinished ++;
         frame.setVisible(false);
@@ -280,19 +283,51 @@ public class Board extends JPanel implements ActionListener {
     }
 
     public boolean appleLeft() {
-        return x[0]/10+1 < gridAppleX;
+        if(leftDirection) {
+            return y[0]/10+1 < gridAppleY;
+        } else if(rightDirection) {
+            return y[0]/10+1 > gridAppleY;
+        } else if(downDirection) {
+            return x[0]/10+1 < gridAppleX;
+        } else {
+            return x[0]/10+1 > gridAppleX;
+        }
     }
 
     public boolean appleRight() {
-        return x[0]/10+1 > gridAppleX;
+        if(leftDirection) {
+            return y[0]/10+1 > gridAppleY;
+        } else if(rightDirection) {
+            return y[0]/10+1 < gridAppleY;
+        } else if(downDirection) {
+            return x[0]/10+1 > gridAppleX;
+        } else {
+            return x[0] / 10 + 1 < gridAppleX;
+        }
     }
 
     public boolean appleUp() {
-        return y[0]/10+1 > gridAppleY;
+        if(leftDirection) {
+            return x[0]/10+1 > gridAppleX;
+        } else if(rightDirection) {
+            return x[0] / 10 + 1 < gridAppleX;
+        } else if(downDirection) {
+            return y[0]/10+1 < gridAppleY;
+        } else {
+            return y[0]/10+1 > gridAppleY;
+        }
     }
 
     public boolean appleDown() {
-        return y[0]/10+1 < gridAppleY;
+        if(leftDirection) {
+            return x[0]/10+1 < gridAppleX;
+        } else if(rightDirection) {
+            return x[0] / 10 + 1 > gridAppleX;
+        } else if(downDirection) {
+            return y[0]/10+1 > gridAppleY;
+        } else {
+            return y[0]/10+1 < gridAppleY;
+        }
     }
 
 
@@ -311,6 +346,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void checkCollision() {
+
         for (int z = dots; z > 0; z--) {
 
             if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
@@ -371,11 +407,19 @@ public class Board extends JPanel implements ActionListener {
             checkCollision();
 
             if(inGame) {
-               
+
                 determineMove();
+                yDistAppleOld = Math.abs(y[0]/10+1 - gridAppleY);
+                xDistAppleOld = Math.abs(x[0]/10+1 - gridAppleX);
                 move();
                 yDistApple = Math.abs(y[0]/10+1 - gridAppleY);
                 xDistApple = Math.abs(x[0]/10+1 - gridAppleX);
+
+                double currentDist = Math.sqrt(Math.pow((double)xDistApple,2) + Math.pow( (double) yDistApple,2));
+                double oldDist = Math.sqrt(Math.pow((double)xDistAppleOld,2) + Math.pow( (double) yDistAppleOld,2));
+                if(currentDist < oldDist) network.increaseFitness(2);
+                else network.decreaseFitness(3);
+
                 elapsedTime = System.currentTimeMillis()/1000 - start;
                 if(elapsedTime > runtime){
                     endGame();
@@ -457,26 +501,35 @@ public class Board extends JPanel implements ActionListener {
         features = new int[numFeatures];
 
         setExample(features);
-        if(moveType == 1){
         double move[] = network.classify2(features);
-        
-        if( move[0] == 1 && move[1] == 1){
-            if(this.isLeftDirection()){
-                this.pressKey(KeyEvent.VK_DOWN);
-            }
-            else if(this.isRightDirection()){
-                this.pressKey(KeyEvent.VK_UP);
-            }
-            else if(this.isUpDirection()){
-                this.pressKey(KeyEvent.VK_LEFT);
-            }
-            else{
-                this.pressKey(KeyEvent.VK_RIGHT);
-            }
+        double confidence[] = network.confidence(features);
+//        System.out.println(Arrays.toString(move));
+//        System.out.println(Arrays.toString(confidence));
+        int theMove;
 
+        if(move[0]*confidence[0] > move[1]*confidence[1] && move[0]*confidence[0] > move[2]*confidence[2]) {
+            theMove = 1;
+        } else if (move[1]*confidence[1] > move[0]*confidence[0] && move[1]*confidence[1] > move[2]*confidence[2]) {
+            theMove = 2;
+        } else {
+            theMove = 3;
         }
 
-        else if(move[0] == -1 && move[1] == -1){
+        if(theMove == 1){
+            if(this.isLeftDirection()){
+                this.pressKey(KeyEvent.VK_DOWN);
+            }
+            else if(this.isRightDirection()){
+                this.pressKey(KeyEvent.VK_UP);
+            }
+            else if(this.isUpDirection()){
+                this.pressKey(KeyEvent.VK_LEFT);
+            }
+            else{
+                this.pressKey(KeyEvent.VK_RIGHT);
+            }
+        }
+        else if(theMove == 2){
             if(this.isLeftDirection()){
                 this.pressKey(KeyEvent.VK_UP);
             }
@@ -490,61 +543,27 @@ public class Board extends JPanel implements ActionListener {
                 this.pressKey(KeyEvent.VK_LEFT);
             }
         }
-    }
-
-    else{
-        double move = network.classify(features);
-        if( move == -1){
-          
-            if(this.isLeftDirection()){
-                this.pressKey(KeyEvent.VK_DOWN);
-            }
-            else if(this.isRightDirection()){
-                this.pressKey(KeyEvent.VK_UP);
-            }
-            else if(this.isUpDirection()){
-                this.pressKey(KeyEvent.VK_LEFT);
-            }
-            else{
-                this.pressKey(KeyEvent.VK_RIGHT);
-            }
-
-        }
-
-        else if(move == 1){
-            if(this.isLeftDirection()){
-                this.pressKey(KeyEvent.VK_UP);
-            }
-            else if(this.isRightDirection()){
-                this.pressKey(KeyEvent.VK_DOWN);
-            }
-            else if(this.isUpDirection()){
-                this.pressKey(KeyEvent.VK_RIGHT);
-            }
-            else{
-                this.pressKey(KeyEvent.VK_LEFT);
-            }
-    
-    }
-}
     }
     private void setExample(int[] features){
-        features[0] = ((this.getFront() == SNAKE || this.getFront() == WALL) ? -1 : 1);
-        features[1] = ((this.getLeft() == SNAKE || this.getLeft() == WALL) ? -1 : 1);
-        features[2] = ((this.getRight() == SNAKE || this.getRight() == WALL) ? -1 : 1);
-        // features[0] = ((this.getFront() == SNAKE) ? 1 : 0);
-        // features[1] = ((this.getLeft() == SNAKE) ? 1 : 0);
-        // features[2] = ((this.getRight() == SNAKE) ? 1 : 0);
-        // features[3] = ((this.getFront() == WALL) ? 1 : 0);
-        // features[4] = ((this.getLeft() == WALL) ? 1 : 0);
-        // features[5] = ((this.getRight() == WALL) ? 1 : 0);
-        double currentDist= Math.sqrt(Math.pow(y[0]/10+1 - gridAppleY,2) + Math.pow(x[0]/10+1 - gridAppleX,2));
-        double oldDist = Math.sqrt(Math.pow((double)xDistApple,2) + Math.pow( (double) yDistApple,2));
-        if(currentDist < oldDist) features[3] = 1;
-        else features[3] = -1; 
+        features[0] = ((this.getFront() == SNAKE || this.getFront() == WALL) ? 1 : 0);
+        features[1] = ((this.getLeft() == SNAKE || this.getLeft() == WALL) ? 1 : 0);
+        features[2] = ((this.getRight() == SNAKE || this.getRight() == WALL) ? 1 : 0);
 
-       
+        features[3] = ((this.appleLeft()) ? 1 : 0);
+        features[4] = ((this.appleRight()) ? 1 : 0);
+        features[5] = ((this.appleUp()) ? 1 : 0);
+        features[6] = ((this.appleDown()) ? 1 : 0);
+        if(leftDirection)  System.out.println("Going left");
+        if(rightDirection)  System.out.println("Going right");
+        if(upDirection)  System.out.println("Going up");
+        if(downDirection)  System.out.println("Going down");
+
+        System.out.println("Left: " + features[3]);
+        System.out.println("Right: " + features[4]);
+        System.out.println("Up: " + features[5]);
+        System.out.println("Down: " + features[6]);
+        System.out.println("");
+
     }
 
 }
-
