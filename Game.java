@@ -8,8 +8,8 @@ import java.util.Random;
 
 public class Game {
     private  int numFeatures = 7;
-    private  int numNetworks = 48;
-    private  int numGenerations = 10;
+    private  int numNetworks = 20;
+    private  int numGenerations = 20;
 
     ArrayList<GeneticNN> networkList = new ArrayList<GeneticNN>();
     private int total = numNetworks;

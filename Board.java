@@ -20,7 +20,7 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = 900;
     private final int RAND_POS = 29;
-    private final int DELAY = 140;
+    private final int DELAY = 60;
 
     private static final int EMPTY = 0;
     private static final int SNAKE = 1;
@@ -35,7 +35,7 @@ public class Board extends JPanel implements ActionListener {
     private int[][] grid = new int[B_WIDTH/DOT_SIZE+2][B_HEIGHT/DOT_SIZE+2];
 
     public int appleCount =0;
-    private int runtime = 20;
+    private int runtime = 10;
     private int dots;
     private int apple_x;
     private int apple_y;
