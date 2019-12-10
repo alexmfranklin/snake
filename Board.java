@@ -1,569 +1,132 @@
 import ml.classifiers.GeneticNN;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.Arrays;
 import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
-public class Board extends JPanel implements ActionListener {
+public class Game {
+    private static int numFeatures = 7;
+    private static int numNetworks = 10;
+    private static int numGenerations = 20;
+    private static int numChildren = 10;
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -3199194738524258272L;
-    private final int B_WIDTH = 300;
-    private final int B_HEIGHT = 300;
-    private final int DOT_SIZE = 10;
-    private final int ALL_DOTS = 900;
-    private final int RAND_POS = 29;
-    private final int DELAY = 1000;
+    private int total = numNetworks;
+    private int numLayers = 10;
+    private int numHidden = 25;
+    private int numPartners = 4;
 
-    private static final int EMPTY = 0;
-    private static final int SNAKE = 1;
-    private static final int FOOD = 2;
-    private static final int WALL = 3;
+    private Random r = new Random();
 
-    public static int numFinished = 0;
+    public Game() {
 
-    private final int x[] = new int[ALL_DOTS];
-    private final int y[] = new int[ALL_DOTS];
-
-    private int[][] grid = new int[B_WIDTH/DOT_SIZE+2][B_HEIGHT/DOT_SIZE+2];
-
-    public int appleCount =0;
-    private int runtime = 100;
-    private int dots;
-    private int apple_x;
-    private int apple_y;
-    private int gridAppleX;
-    private int gridAppleY;
-    private int xDistApple;
-    private int yDistApple;
-    private int xDistAppleOld;
-    private int yDistAppleOld;
-
-
-    private Boolean hasDied = false;
-    private boolean leftDirection = false;
-    private boolean rightDirection = true;
-    private boolean upDirection = false;
-    private boolean downDirection = false;
-    private boolean inGame = true;
-    private boolean newTurn = true;
-    private Timer timer;
-    private Image ball;
-    private Image apple;
-    private Image head;
-    private JFrame frame;
-
-    private GeneticNN network;
-    private int numFeatures;
-    int[] features;
-    Robot r = new Robot();
-
-
-    long gameStart;
-    long gameEnd;
-    long start;
-    long elapsedTime;
-
-
-    public Board() throws AWTException {
- 
-        initBoard();
     }
 
-    private void initBoard() {
+    public static void main(String[] args) throws AWTException {
+        Game game = new Game();
 
-        addKeyListener(new TAdapter());
-        setBackground(Color.black);
-        setFocusable(true);
+        ArrayList<GeneticNN> networkList = new ArrayList<GeneticNN>();
+        ArrayList<GeneticNN> networkList2 = new ArrayList<GeneticNN>();
+        for(int i = 0; i < numChildren; i ++) {
+            GeneticNN network = new GeneticNN(25, 25);
+            network.train(numFeatures);
+            networkList.add(network);
+        }
 
-        setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
-        loadImages();
-        initGame();
+        game.runGen(networkList);
+        for(int g = 1; g < numGenerations; g ++) {
+            networkList2 = game.nextGen(networkList);
+            game.runGen(networkList2);
+            networkList = networkList2;
+            //mutate all networks using mutation function (mutates all weights a little)
+            for(GeneticNN net : networkList) {
+                net.mutate(0.15);
+            }
+        }
     }
 
-    private void loadImages() {
+    public void runGen(ArrayList<GeneticNN> networkList) throws AWTException {
+        for (int i = 0; i < numNetworks; i++) {
+            Snake snake = new Snake();
+            Board board  = snake.getBoard();
 
-        ImageIcon iid = new ImageIcon("dot.png");
-        ball = iid.getImage();
+            board.setNumFeatures(numFeatures);
 
-        ImageIcon iia = new ImageIcon("apple.png");
-        apple = iia.getImage();
+            board.setNetwork(networkList.get(i));
 
-        ImageIcon iih = new ImageIcon("head.png");
-        head = iih.getImage();
+            EventQueue.invokeLater(() -> {
+                JFrame ex = snake;
+                board.setJFrame(ex);
+                ex.setVisible(true);
+            });
+        }
+
+        while(Board.numFinished < total){
+            System.out.print("");
+        }
+        total+= numNetworks;
+
     }
 
-    private void initGame() {
+    public ArrayList<GeneticNN> nextGen(ArrayList<GeneticNN> networkList) {
+        ArrayList<GeneticNN> allTheChildren = new ArrayList<GeneticNN>();
 
-        for(int i = 0; i < grid.length; i ++) {
-            for(int j = 0; j < grid[i].length; j ++) {
-                if(i == 0 || j == 0 || i == grid.length-1 || j == grid[i].length-1) {
-                    grid[i][j] = WALL;
-                } else {
-                    grid[i][j] = EMPTY;
+        Collections.sort(networkList, GeneticNN.byFitness());
+        
+        System.out.println(networkList.get(numNetworks-2).fitness() + "'" + networkList.get(numNetworks-1).fitness());
+        if(networkList.get(0).fitness() == networkList.get(numNetworks-1).fitness()) {
+            for(int i = 0; i < numChildren/2; i ++) {
+                int index1 = r.nextInt(numNetworks);
+                int index2 = r.nextInt(numNetworks);
+                while (index2 == index1) {
+                    index2 = r.nextInt(numNetworks);
+                }
+                GeneticNN net1 = networkList.get(index1);
+                GeneticNN net2 = networkList.get(index2);
+                ArrayList<GeneticNN> someChildren = crossover(net1, net2, 2);
+                for(int j = 0; j < someChildren.size(); j ++) {
+                    allTheChildren.add(someChildren.get(j));
                 }
             }
-        }
-
-        dots = 3;
-
-        for (int z = 0; z < dots; z++) {
-            x[z] = 50 - z * 10;
-            y[z] = 50;
-            grid[4-z][4] = SNAKE;
-        }
-
-        locateApple();
-
-        timer = new Timer(DELAY, this);
-        timer.start();
-
-        start = System.currentTimeMillis()/1000;
-        gameStart = System.currentTimeMillis()/1000;
-    }
-
-    public void setNetwork(GeneticNN theNetwork){
-        network = theNetwork;
-    }
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        doDrawing(g);
-    }
-
-    public void endGame(){
-        inGame = false;
-    }
-
-    public void setJFrame(JFrame frame) {
-        this.frame = frame;
-    }
-
-    private void doDrawing(Graphics g) {
-
-        if (inGame) {
-
-            g.drawImage(apple, apple_x, apple_y, this);
-
-//            for(int i = 1; i < grid.length-1; i ++){
-//                for(int j = 1; j < grid[i].length-1; j ++) {
-//
-//                    if(grid[i][j] == SNAKE) {
-//                        g.drawImage(head, i*10, j*10, this);
-//                    } else if(grid[i][j] == FOOD) {
-//                       g.drawImage(ball, i*10, j*10, this);
-//                    }
-//                }
-//            }
-
-
-            for (int z = 0; z < dots; z++) {
-                if (z == 0) {
-                    g.drawImage(head, x[z], y[z], this);
-                } else {
-                    g.drawImage(ball, x[z], y[z], this);
-                }
-            }
-            yDistApple = Math.abs(y[0]/10+1 - gridAppleY);
-            xDistApple = Math.abs(x[0]/10+1 - gridAppleX);
-            Toolkit.getDefaultToolkit().sync();
-
+            return allTheChildren;
         } else {
-
-            gameOver(g);
-        }
-    }
-
-    private void gameOver(Graphics g) {
-
-
-        String msg = "Game Over";
-        Font small = new Font("Helvetica", Font.BOLD, 14);
-        FontMetrics metr = getFontMetrics(small);
-
-        g.setColor(Color.white);
-        g.setFont(small);
-        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
-        gameEnd = System.currentTimeMillis()/1000 - gameStart;
-        if(hasDied == true) network.deathFitness();
-        network.increaseFitness(appleCount*10);
-        timer.stop();
-
-        //System.out.println(network.fitness());
-
-        numFinished ++;
-        frame.setVisible(false);
-        frame.dispose();
-    }
-
-    private void checkApple() {
-
-        if ((x[0] == apple_x) && (y[0] == apple_y)) {
-            start = System.currentTimeMillis()/1000;
-            appleCount++;
-            dots++;
-            locateApple();
-        }
-    }
-    public boolean isGameOver(){
-        return !inGame;
-    }
-    private void move() {
-
-        for (int z = dots; z > 0; z--) {
-            //grid[(x[z]/10)][(y[z]/10)] = grid[(x[z-1]/10)][(y[z-1]/10)];
-            x[z] = x[(z - 1)];
-            y[z] = y[(z - 1)];
-        }
-        grid[(x[dots]/10+1)][(y[dots]/10)+1] = EMPTY;
-
-
-        if (leftDirection) {
-            x[0] -= DOT_SIZE;
-            grid[(x[0]/10)+1][(y[0]/10)+1] = SNAKE;
-        }
-
-        if (rightDirection) {
-            x[0] += DOT_SIZE;
-            grid[(x[0]/10)+1][(y[0]/10)+1] = SNAKE;
-        }
-
-        if (upDirection) {
-            y[0] -= DOT_SIZE;
-            grid[(x[0]/10)+1][(y[0]/10)+1] = SNAKE;
-        }
-
-        if (downDirection) {
-            y[0] += DOT_SIZE;
-            grid[(x[0]/10)+1][(y[0]/10)+1] = SNAKE;
-        }
-    }
-
-    public int getLeft() {
-        if(leftDirection) {
-            return grid[x[0]/10+1][y[0]/10+1+1];
-        } else if (rightDirection) {
-            return grid[x[0]/10+1][y[0]/10+1-1];
-        } else if (upDirection) {
-            return grid[x[0]/10+1-1][y[0]/10+1];
-        } else {
-            return grid[x[0]/10+1+1][y[0]/10+1];
-        }
-    }
-
-    public int getRight() {
-        if(leftDirection) {
-            return grid[x[0]/10+1][y[0]/10+1-1];
-        } else if (rightDirection) {
-            return grid[x[0]/10+1][y[0]/10+1+1];
-        } else if (upDirection) {
-            return grid[x[0]/10+1+1][y[0]/10+1];
-        } else {
-            return grid[x[0]/10+1-1][y[0]/10+1];
-        }
-    }
-
-    public int getFront() {
-        if(leftDirection) {
-            return grid[x[0]/10+1-1][y[0]/10+1];
-        } else if (rightDirection) {
-            return grid[x[0]/10+1+1][y[0]/10+1];
-        } else if (upDirection) {
-            return grid[x[0]/10+1][y[0]/10+1-1];
-        } else {
-            return grid[x[0]/10+1][y[0]/10+1+1];
-        }
-    }
-
-    public boolean appleLeft() {
-        if(leftDirection) {
-            return y[0]/10+1 < gridAppleY;
-        } else if(rightDirection) {
-            return y[0]/10+1 > gridAppleY;
-        } else if(downDirection) {
-            return x[0]/10+1 < gridAppleX;
-        } else {
-            return x[0]/10+1 > gridAppleX;
-        }
-    }
-
-    public boolean appleRight() {
-        if(leftDirection) {
-            return y[0]/10+1 > gridAppleY;
-        } else if(rightDirection) {
-            return y[0]/10+1 < gridAppleY;
-        } else if(downDirection) {
-            return x[0]/10+1 > gridAppleX;
-        } else {
-            return x[0] / 10 + 1 < gridAppleX;
-        }
-    }
-
-    public boolean appleUp() {
-        if(leftDirection) {
-            return x[0]/10+1 > gridAppleX;
-        } else if(rightDirection) {
-            return x[0] / 10 + 1 < gridAppleX;
-        } else if(downDirection) {
-            return y[0]/10+1 < gridAppleY;
-        } else {
-            return y[0]/10+1 > gridAppleY;
-        }
-    }
-
-    public boolean appleDown() {
-        if(leftDirection) {
-            return x[0]/10+1 < gridAppleX;
-        } else if(rightDirection) {
-            return x[0] / 10 + 1 > gridAppleX;
-        } else if(downDirection) {
-            return y[0]/10+1 > gridAppleY;
-        } else {
-            return y[0]/10+1 < gridAppleY;
-        }
-    }
-
-
-
-
-    public boolean isLeftDirection() {
-        return leftDirection;
-    }
-
-    public boolean isRightDirection() {
-        return rightDirection;
-    }
-
-    public boolean isUpDirection() {
-        return upDirection;
-    }
-
-    private void checkCollision() {
-
-        for (int z = dots; z > 0; z--) {
-
-            if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
-                inGame = false;
-                hasDied = true;
+           for(int i = numNetworks-2; i >= numNetworks-2 - numPartners; i-- ){
+            GeneticNN net1 = networkList.get(numNetworks-1);
+            GeneticNN net2 = networkList.get(i);
+            ArrayList<GeneticNN> someChildren = crossover(net1, net2, numChildren/numPartners);
+            for(int j = 0; j < someChildren.size(); j ++) {
+                allTheChildren.add(someChildren.get(j));
             }
         }
-
-        if (y[0] >= B_HEIGHT) {
-            inGame = false;
-            hasDied = true;
-            
-        }
-
-        if (y[0] < 0) {
-            inGame = false;
-            hasDied = true;
-        }
-
-        if (x[0] >= B_WIDTH) {
-            inGame = false;
-            hasDied = true;
-        }
-
-        if (x[0] < 0) {
-            inGame = false;
-            hasDied = true;
-        }
-
-        if (!inGame) {
-            timer.stop();
+            return allTheChildren;
         }
     }
 
-    private void locateApple() {
-        int rx = (int) (Math.random() * RAND_POS);
-        int ry = (int) (Math.random() * RAND_POS);
-        while(grid[rx+1][ry+1] == SNAKE) {
-            rx = (int) (Math.random() * RAND_POS);
-            ry = (int) (Math.random() * RAND_POS);
+    private ArrayList<GeneticNN> crossover (GeneticNN net1, GeneticNN net2, int numChildren) {
+
+        ArrayList<GeneticNN> networks = new ArrayList<GeneticNN>();
+
+        for(int i = 0; i < numChildren; i ++) {
+            int rand = r.nextInt(net1.getNumLayers()+2);
+           // if (i < numChildren/2) {
+                double[][] input = net1.getInputTable();
+                double[][][] left = net1.getLayerTable(rand, GeneticNN.LEFT);
+                double[][][] right = net2.getLayerTable(rand, GeneticNN.RIGHT);
+                double[][] output = net1.getOutputTable2();
+                GeneticNN newNetwork = new GeneticNN(input, left, right, rand, output, numLayers, numHidden);
+                networks.add(newNetwork);
+           /*} else {
+                double[][] input = net2.getInputTable();
+                double[][][] left = net2.getLayerTable(rand, GeneticNN.LEFT);
+                double[][][] right = net1.getLayerTable(rand, GeneticNN.RIGHT);
+                double[][] output = net2.getOutputTable2();
+                GeneticNN newNetwork = new GeneticNN(input, left, right, rand, output, numLayers, numHidden);
+
+                networks.add(newNetwork);
+            }*/
         }
-
-        apple_x = ((rx * DOT_SIZE));
-        apple_y = ((ry * DOT_SIZE));
-
-        gridAppleX = rx+1;
-        gridAppleY = ry+1;
-        grid[rx+1][ry+1] = FOOD;
-    }
-    public boolean hasMoved(){
-        return newTurn;
-    }
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (inGame) {
-
-            checkApple();
-            checkCollision();
-
-            if(inGame) {
-
-                determineMove();
-                yDistAppleOld = Math.abs(y[0]/10+1 - gridAppleY);
-                xDistAppleOld = Math.abs(x[0]/10+1 - gridAppleX);
-                move();
-                yDistApple = Math.abs(y[0]/10+1 - gridAppleY);
-                xDistApple = Math.abs(x[0]/10+1 - gridAppleX);
-
-                double currentDist = Math.sqrt(Math.pow((double)xDistApple,2) + Math.pow( (double) yDistApple,2));
-                double oldDist = Math.sqrt(Math.pow((double)xDistAppleOld,2) + Math.pow( (double) yDistAppleOld,2));
-                if(currentDist < oldDist) network.increaseFitness(2);
-                else network.decreaseFitness(3);
-
-                elapsedTime = System.currentTimeMillis()/1000 - start;
-                if(elapsedTime > runtime){
-                    endGame();
-                }
-
-            }
-        }
-
-        repaint();
-
-
-
-    }
-
-    public void pressKey(int key) {
-        if ((key == KeyEvent.VK_LEFT ) && (!rightDirection)) {
-            leftDirection = true;
-            upDirection = false;
-            downDirection = false;
-        }
-
-        if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
-            rightDirection = true;
-            upDirection = false;
-            downDirection = false;
-        }
-
-        if ((key == KeyEvent.VK_UP) && (!downDirection)) {
-            upDirection = true;
-            rightDirection = false;
-            leftDirection = false;
-        }
-
-        if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
-            downDirection = true;
-            rightDirection = false;
-            leftDirection = false;
-        }
-    }
-
-    private class TAdapter extends KeyAdapter {
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-
-            int key = e.getKeyCode();
-
-            if ((key == KeyEvent.VK_LEFT ) && (!rightDirection)) {
-                leftDirection = true;
-                upDirection = false;
-                downDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
-                rightDirection = true;
-                upDirection = false;
-                downDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_UP) && (!downDirection)) {
-                upDirection = true;
-                rightDirection = false;
-                leftDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
-                downDirection = true;
-                rightDirection = false;
-                leftDirection = false;
-            }
-        }
-    }
-    public void setNumFeatures(int i) {
-        numFeatures = i;
-    }
-
-    public void determineMove(){
-
-        features = new int[numFeatures];
-
-        setExample(features);
-        double move[] = network.classify2(features);
-        double confidence[] = network.confidence(features);
-//        System.out.println(Arrays.toString(move));
-//        System.out.println(Arrays.toString(confidence));
-        int theMove;
-
-        if(move[0]*confidence[0] > move[1]*confidence[1] && move[0]*confidence[0] > move[2]*confidence[2]) {
-            theMove = 1;
-        } else if (move[1]*confidence[1] > move[0]*confidence[0] && move[1]*confidence[1] > move[2]*confidence[2]) {
-            theMove = 2;
-        } else {
-            theMove = 3;
-        }
-
-        if(theMove == 1){
-            if(this.isLeftDirection()){
-                this.pressKey(KeyEvent.VK_DOWN);
-            }
-            else if(this.isRightDirection()){
-                this.pressKey(KeyEvent.VK_UP);
-            }
-            else if(this.isUpDirection()){
-                this.pressKey(KeyEvent.VK_LEFT);
-            }
-            else{
-                this.pressKey(KeyEvent.VK_RIGHT);
-            }
-        }
-        else if(theMove == 2){
-            if(this.isLeftDirection()){
-                this.pressKey(KeyEvent.VK_UP);
-            }
-            else if(this.isRightDirection()){
-                this.pressKey(KeyEvent.VK_DOWN);
-            }
-            else if(this.isUpDirection()){
-                this.pressKey(KeyEvent.VK_RIGHT);
-            }
-            else{
-                this.pressKey(KeyEvent.VK_LEFT);
-            }
-        }
-    }
-    private void setExample(int[] features){
-        features[0] = ((this.getFront() == SNAKE || this.getFront() == WALL) ? 1 : 0);
-        features[1] = ((this.getLeft() == SNAKE || this.getLeft() == WALL) ? 1 : 0);
-        features[2] = ((this.getRight() == SNAKE || this.getRight() == WALL) ? 1 : 0);
-
-        features[3] = ((this.appleLeft()) ? 1 : 0);
-        features[4] = ((this.appleRight()) ? 1 : 0);
-        features[5] = ((this.appleUp()) ? 1 : 0);
-        features[6] = ((this.appleDown()) ? 1 : 0);
-        if(leftDirection)  System.out.println("Going left");
-        if(rightDirection)  System.out.println("Going right");
-        if(upDirection)  System.out.println("Going up");
-        if(downDirection)  System.out.println("Going down");
-
-        System.out.println("Left: " + features[3]);
-        System.out.println("Right: " + features[4]);
-        System.out.println("Up: " + features[5]);
-        System.out.println("Down: " + features[6]);
-        System.out.println("");
-
+        return networks;
     }
 
 }
