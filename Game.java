@@ -7,15 +7,15 @@ import java.util.Collections;
 
 
 public class Game {
-    private  int numFeatures = 10;
-    private  int numNetworks = 48;
+    private  int numFeatures = 7;
+    private  int numNetworks = 24;
     private  int numGenerations = 10;
 
     ArrayList<GeneticNN> networkList = new ArrayList<GeneticNN>();
     private int total = numNetworks;
     public int numLayers = 1;
     public int numHidden = 25;
-    private int numPartners = 1;
+    
 
 
     public static void main(String[] args) throws AWTException {
@@ -84,17 +84,12 @@ public class Game {
 
         Collections.sort(networkList, GeneticNN.byFitness());
 
-             for (GeneticNN geneticNN : networkList) {
-                 int i = 0;
-                 System.out.println("index:" +i+ " "+ geneticNN.fitness());
-                 i++;
-                 
-             }
+           
 
            // for (int i = numNetworks - 2; i >= numNetworks - 2 - numPartners; i--) {
                 GeneticNN net1 = networkList.get(numNetworks - 1);
                 GeneticNN net2 = networkList.get(numNetworks-2);
-                ArrayList<GeneticNN> someChildren = crossover(net1, net2, numNetworks / numPartners);
+                ArrayList<GeneticNN> someChildren = crossover(net1, net2, numNetworks);
                 
                 for (int j = 0; j < someChildren.size(); j++) {
                     allTheChildren.add(someChildren.get(j));

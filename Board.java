@@ -34,7 +34,7 @@ public class Board extends JPanel implements ActionListener {
     private int[][] grid = new int[B_WIDTH/DOT_SIZE+2][B_HEIGHT/DOT_SIZE+2];
 
     public int appleCount =0;
-    private int runtime = 20;
+    private int runtime = 15;
     private int dots;
     private int apple_x;
     private int apple_y;
@@ -543,16 +543,14 @@ public class Board extends JPanel implements ActionListener {
         }
     }
     private void setExample(int[] features){
-        features[0] = ((this.getFront() == SNAKE ) ? 1 : 0);
-        features[1] = ((this.getLeft() == SNAKE ) ? 1 : 0);
-        features[2] = ((this.getRight() == SNAKE ) ? 1 : 0);
+        features[0] = ((this.getFront() == SNAKE ||  this.getFront() == WALL) ? 1 : 0);
+        features[1] = ((this.getLeft() == SNAKE || this.getLeft() == WALL) ? 1 : 0);
+        features[2] = ((this.getRight() == SNAKE || (this.getRight() == WALL) ) ? 1 : 0);
         features[3] = ((this.appleLeft()) ? 1 : 0);
         features[4] = ((this.appleRight()) ? 1 : 0);
         features[5] = ((this.appleUp()) ? 1 : 0);
         features[6] = ((this.appleDown()) ? 1 : 0);
-        features[7] = (( this.getFront() == WALL) ? 1 : 0);
-        features[8] = ((this.getLeft() == SNAKE || this.getLeft() == WALL) ? 1 : 0);
-        features[9] = ((this.getRight() == WALL) ? 1 : 0);
+       
 
 
     }
