@@ -14,7 +14,7 @@ public class Snake extends JFrame {
         initUI();
     }
 
-    public Board getBoard(){
+    public Board getBoard() {
         return board;
     }
 
@@ -30,6 +30,5 @@ public class Snake extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
-
 
 }
