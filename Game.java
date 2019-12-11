@@ -7,7 +7,7 @@ import java.util.Collections;
 
 
 public class Game {
-    private  int numFeatures = 10;
+    private  int numFeatures = 7;
     private  int numNetworks = 48;
     private  int numGenerations = 10;
 
@@ -15,7 +15,7 @@ public class Game {
     private int total = numNetworks;
     public int numLayers = 1;
     public int numHidden = 25;
-    private int numPartners = 1;
+    public int genNum = 1;
 
 
     public static void main(String[] args) throws AWTException {
@@ -29,7 +29,7 @@ public class Game {
      */
     public Game() {
         for (int i = 0; i < numNetworks; i++) {
-            GeneticNN network = new GeneticNN(numHidden, numLayers, numFeatures);
+            GeneticNN network = new GeneticNN(numHidden, numLayers, numFeatures, genNum);
             network.train();
             networkList.add(network);
         }
@@ -76,7 +76,7 @@ public class Game {
         }
         
         total += numNetworks;
-
+        genNum++;
     }
 
     public ArrayList<GeneticNN> nextGen(ArrayList<GeneticNN> networkList) {
@@ -84,27 +84,26 @@ public class Game {
 
         Collections.sort(networkList, GeneticNN.byFitness());
 
-             for (GeneticNN geneticNN : networkList) {
-                 int i = 0;
-                 System.out.println("index:" +i+ " "+ geneticNN.fitness());
-                 i++;
+             for (int i= 0; i < networkList.size(); i++) {
+                 System.out.println("index:" +i+ " "+ networkList.get(i).fitness());
+                 
                  
              }
 
-           // for (int i = numNetworks - 2; i >= numNetworks - 2 - numPartners; i--) {
+          
                 GeneticNN net1 = networkList.get(numNetworks - 1);
                 GeneticNN net2 = networkList.get(numNetworks-2);
-                ArrayList<GeneticNN> someChildren = crossover(net1, net2, numNetworks / numPartners);
+                ArrayList<GeneticNN> someChildren = crossover(net1, net2);
                 
                 for (int j = 0; j < someChildren.size(); j++) {
                     allTheChildren.add(someChildren.get(j));
-                }
-            //}
+                
+            }
             return allTheChildren;
 
     }
 
-    private ArrayList<GeneticNN> crossover(GeneticNN net1, GeneticNN net2, int numChildren) {
+    private ArrayList<GeneticNN> crossover(GeneticNN net1, GeneticNN net2) {
 
         ArrayList<GeneticNN> networks = new ArrayList<GeneticNN>();
 
@@ -119,7 +118,7 @@ public class Game {
         
         
         for (int num = 0; num < numNetworks; num++) {
-            GeneticNN tmpNetwork = new GeneticNN(numHidden, numLayers, numFeatures);
+            GeneticNN tmpNetwork = new GeneticNN(numHidden, numLayers, numFeatures, genNum);
             tmpNetwork.crossOver(input1, layers1, output1, input2, layers2, output2);
             tmpNetwork.mutate(.01);
             networks.add(tmpNetwork);

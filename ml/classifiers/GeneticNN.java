@@ -18,15 +18,17 @@ public class GeneticNN implements Comparable<GeneticNN>{
     public static int LEFT = 0;
     public static int RIGHT = 1;
     private int fitness=1;
+    private int genNum;
     private Random r = new Random();
   
 
     /**
      * @param numHidden
      */
-    public GeneticNN(int numHidden,int layers, int numFeatures) {
+    public GeneticNN(int numHidden,int layers, int numFeatures, int gen_num) {
         this.numHidden = numHidden;
         this.numFeatures = numFeatures;
+        genNum = gen_num;
         numLayers = layers;
         output = new double[3];
         inputTable = new double[numFeatures][numHidden];
@@ -87,7 +89,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
             for (int i = 0; i < numHidden+1; i++) {
                 for (int j = 0; j < output.length; j++) {
                     // sets range of nextDouble to -.1-.1 and assigns value to table
-                    outputTable[i][j] =  random.nextGaussian();
+                    outputTable[i][j] +=  random.nextGaussian();
                 }
     
             }
@@ -202,7 +204,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
                 for (int j = 0; j < layerTable[m][i].length; j++) {
                     double rand = r.nextDouble();
                     if (rand < mutationRate) {
-                        layerTable[m][i][j] = r.nextGaussian() ;
+                        layerTable[m][i][j] += r.nextGaussian()/5 ;
 
 
                     }
@@ -213,7 +215,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
             for(int j = 0; j < inputTable[i].length; j ++) {
                 double rand = r.nextDouble();
                 if (rand < mutationRate) {
-                    inputTable[i][j] = r.nextGaussian();
+                    inputTable[i][j] = r.nextGaussian()/5;
                 }
     
             }
@@ -222,7 +224,7 @@ public class GeneticNN implements Comparable<GeneticNN>{
             for(int k = 0; k < outputTable[0].length; k ++) {
             double rand = r.nextDouble();
             if (rand < mutationRate) {
-                outputTable[j][k] = r.nextGaussian();
+                outputTable[j][k] = r.nextGaussian()/5;
             }
 
 
@@ -238,7 +240,8 @@ public class GeneticNN implements Comparable<GeneticNN>{
     }
 
     public void deathFitness() {
-        fitness -= 100;
+        if(genNum > 5) fitness = fitness - 1000;
+        else fitness -= 100 + genNum*10;
     }
 
     public static Comparator<GeneticNN> byFitness(){
