@@ -5,9 +5,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/Board.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/Game.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/snake/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/snake/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml/classifiers/GeneticNN.java" beforeDir="false" afterPath="$PROJECT_DIR$/ml/classifiers/GeneticNN.java" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,18 +24,6 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
   <component name="RunManager">
     <configuration name="Game" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Game" />
@@ -50,6 +37,18 @@
         <item itemvalue="Application.Game" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -76,7 +75,14 @@
       <option name="project" value="LOCAL" />
       <updated>1575949205435</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="kjagsdasdasd">
+      <created>1576012540342</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1576012540342</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -95,36 +101,47 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="snakes rotate need more features?" />
     <MESSAGE value="don't print fitness" />
-    <option name="LAST_COMMIT_MESSAGE" value="don't print fitness" />
+    <MESSAGE value="kjagsdasdasd" />
+    <option name="LAST_COMMIT_MESSAGE" value="kjagsdasdasd" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="2010" y="149" width="769" height="815" key="CommitChangelistDialog2" timestamp="1575880326953">
-      <screen x="1440" y="0" width="1920" height="1080" />
+    <state x="380" y="106" width="769" height="815" key="CommitChangelistDialog2" timestamp="1576012540041">
+      <screen x="0" y="0" width="1280" height="768" />
     </state>
+    <state x="380" y="106" key="CommitChangelistDialog2/0.0.1280.768@0.0.1280.768" timestamp="1576012540041" />
     <state x="2010" y="149" width="769" height="815" key="CommitChangelistDialog2/1440.0.1920.1080/3360.91.1440.900/0.82.1440.900@1440.0.1920.1080" timestamp="1575880326953" />
-    <state width="1214" height="171" key="GridCell.Tab.0.bottom" timestamp="1576012452421">
+    <state width="1214" height="171" key="GridCell.Tab.0.bottom" timestamp="1576017857034">
       <screen x="0" y="0" width="1280" height="768" />
     </state>
-    <state width="1214" height="171" key="GridCell.Tab.0.bottom/0.0.1280.768@0.0.1280.768" timestamp="1576012452421" />
+    <state width="1214" height="171" key="GridCell.Tab.0.bottom/0.0.1280.768@0.0.1280.768" timestamp="1576017857034" />
     <state width="1874" height="275" key="GridCell.Tab.0.bottom/1440.0.1920.1080/3360.91.1440.900/0.82.1440.900@1440.0.1920.1080" timestamp="1575880488882" />
-    <state width="1214" height="171" key="GridCell.Tab.0.center" timestamp="1576012452420">
+    <state width="1214" height="171" key="GridCell.Tab.0.center" timestamp="1576017857033">
       <screen x="0" y="0" width="1280" height="768" />
     </state>
-    <state width="1214" height="171" key="GridCell.Tab.0.center/0.0.1280.768@0.0.1280.768" timestamp="1576012452420" />
+    <state width="1214" height="171" key="GridCell.Tab.0.center/0.0.1280.768@0.0.1280.768" timestamp="1576017857033" />
     <state width="1874" height="275" key="GridCell.Tab.0.center/1440.0.1920.1080/3360.91.1440.900/0.82.1440.900@1440.0.1920.1080" timestamp="1575880488882" />
-    <state width="1214" height="171" key="GridCell.Tab.0.left" timestamp="1576012452419">
+    <state width="1214" height="171" key="GridCell.Tab.0.left" timestamp="1576017857033">
       <screen x="0" y="0" width="1280" height="768" />
     </state>
-    <state width="1214" height="171" key="GridCell.Tab.0.left/0.0.1280.768@0.0.1280.768" timestamp="1576012452419" />
+    <state width="1214" height="171" key="GridCell.Tab.0.left/0.0.1280.768@0.0.1280.768" timestamp="1576017857033" />
     <state width="1874" height="275" key="GridCell.Tab.0.left/1440.0.1920.1080/3360.91.1440.900/0.82.1440.900@1440.0.1920.1080" timestamp="1575880488882" />
-    <state width="1214" height="171" key="GridCell.Tab.0.right" timestamp="1576012452420">
+    <state width="1214" height="171" key="GridCell.Tab.0.right" timestamp="1576017857033">
       <screen x="0" y="0" width="1280" height="768" />
     </state>
-    <state width="1214" height="171" key="GridCell.Tab.0.right/0.0.1280.768@0.0.1280.768" timestamp="1576012452420" />
+    <state width="1214" height="171" key="GridCell.Tab.0.right/0.0.1280.768@0.0.1280.768" timestamp="1576017857033" />
     <state width="1874" height="275" key="GridCell.Tab.0.right/1440.0.1920.1080/3360.91.1440.900/0.82.1440.900@1440.0.1920.1080" timestamp="1575880488882" />
-    <state x="1995" y="289" width="800" height="534" key="Vcs.Push.Dialog.v2" timestamp="1575880395770">
-      <screen x="1440" y="0" width="1920" height="1080" />
+    <state x="358" y="103" key="MultipleFileMergeDialog" timestamp="1576108731488">
+      <screen x="0" y="0" width="1280" height="768" />
     </state>
+    <state x="358" y="103" key="MultipleFileMergeDialog/0.0.1280.768@0.0.1280.768" timestamp="1576108731488" />
+    <state x="370" y="206" width="800" height="534" key="Vcs.Push.Dialog.v2" timestamp="1576012544272">
+      <screen x="0" y="0" width="1280" height="768" />
+    </state>
+    <state x="370" y="206" key="Vcs.Push.Dialog.v2/0.0.1280.768@0.0.1280.768" timestamp="1576012544272" />
     <state x="1995" y="289" width="800" height="534" key="Vcs.Push.Dialog.v2/1440.0.1920.1080/3360.91.1440.900/0.82.1440.900@1440.0.1920.1080" timestamp="1575880395770" />
+    <state x="358" y="178" width="553" height="411" key="git4idea.merge.GitPullDialog" timestamp="1576108715854">
+      <screen x="0" y="0" width="1280" height="768" />
+    </state>
+    <state x="358" y="178" width="553" height="411" key="git4idea.merge.GitPullDialog/0.0.1280.768@0.0.1280.768" timestamp="1576108715854" />
   </component>
 </project>
