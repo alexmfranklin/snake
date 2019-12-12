@@ -11,6 +11,7 @@ public class GeneticNN implements Comparable<GeneticNN> {
 
     private int numHidden;
     private int numLayers = 1;
+    private int appleCount = 0;
     private int numFeatures;
 
     //weights for first and last layers in network
@@ -244,18 +245,33 @@ public class GeneticNN implements Comparable<GeneticNN> {
      * decrease the fitness of this model
      * @param count the amount to decrease fitness by
      */
-    public void decreaseFitness(int count) {
-        fitness = fitness - count;
+    public void decreaseFitness(int amount) {
+        fitness = fitness - amount;
     }
 
     /**
      * increase the fitness of this model
      * @param count the amount to increase fitness by
      */
-    public void increaseFitness(int count) {
-        fitness = fitness + count;
+    public void increaseFitness(int amount) {
+        fitness = fitness + amount;
     }
 
+    /**
+     * increase the fitness of this model by 200 times the amount of apples eaten 
+     * @param count the amount to of apples eaten
+     */
+    public void applesEaten(int count){
+        appleCount = count;
+        fitness = fitness+count*200;
+    }
+    /**
+     * 
+     * @return amount of apples eaten
+     */
+    public int appleCount(){
+        return appleCount;
+    }
     /**
      * alter the fitness by the appropriate amount if the network dies
      */

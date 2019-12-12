@@ -24,7 +24,7 @@ public class Board extends JPanel implements ActionListener {
     private final int ALL_DOTS = 900;
     private final int RAND_POS = 29;
     private final int DELAY = 120;
-    private int runtime = 10;
+    private int runtime = 15;
 
     Random r = new Random();
 
@@ -57,7 +57,7 @@ public class Board extends JPanel implements ActionListener {
     private boolean upDirection = false;
     private boolean downDirection = false;
     private boolean inGame = true;
-    private boolean newTurn = true;
+  
 
     //images and timer for the UI
     private Timer timer;
@@ -214,7 +214,7 @@ public class Board extends JPanel implements ActionListener {
         //alter the fitness depending on if the snake died or not
         if (hasDied == true)
             network.deathFitness();
-        network.increaseFitness(appleCount * 200);
+        network.applesEaten(appleCount);
 
         //indicate that this snake has stopped running
         numFinished++;

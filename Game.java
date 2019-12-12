@@ -6,17 +6,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Game {
+    
+    public static int iterations = 10;
+
     //parameters for the genetic algorithm
     private int numFeatures = 7;
     private int numNetworks = 20;
-    private int numGenerations = 25;
+    private int numGenerations = 10;
     public int genNum = 1;
+   
 
     //parameters for each neural network in the genetic algorithm
     ArrayList<GeneticNN> networkList = new ArrayList<GeneticNN>();
-    private int total = numNetworks;
+    private int total;
     public int numLayers = 1;
-    public int numHidden = 30;
+    public int numHidden = 25;
 
     /**
      * run the game
@@ -26,12 +30,16 @@ public class Game {
     public static void main(String[] args) throws AWTException {
         Game game = new Game();
         game.start();
+
+
     }
+
 
     /**
      * Initializes first gen of neural nets
      */
     public Game() {
+        total = numNetworks;
         for (int i = 0; i < numNetworks; i++) {
             GeneticNN network = new GeneticNN(numHidden, numLayers, numFeatures, genNum);
             network.train();
@@ -39,13 +47,14 @@ public class Game {
         }
     }
 
+   
     /**
      * run the generation of snakes and then create children based on the results
      * @throws AWTException
      */
     public void start() throws AWTException {
         this.runGen(networkList);
-        for (int g = 1; g < numGenerations; g++) {
+        for (int g = 1; g <= numGenerations; g++) {
             ArrayList<GeneticNN> newNetList = nextGen(networkList);
             networkList = newNetList;
             runGen(networkList);
@@ -91,6 +100,14 @@ public class Game {
         ArrayList<GeneticNN> allTheChildren = new ArrayList<GeneticNN>(); //the new generation
 
         Collections.sort(networkList, GeneticNN.byFitness());
+        
+        // prints average performance per generation
+        double count = 0;
+        for (GeneticNN net : networkList) {
+            count+= net.appleCount();
+        }
+        System.out.println(count/numNetworks);
+
 
         //Get the top 2 fittest networks and call the crossover function on them
         GeneticNN net1 = networkList.get(numNetworks - 1);
